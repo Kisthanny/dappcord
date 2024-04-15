@@ -1,15 +1,14 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-
+import ChannelsBar from "./features/channelsBar/ChannelsBar";
+import ChatBox from "./features/chatbox/ChatBox";
+import ServerBar from "./features/serverBar/ServerBar";
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      
-    </>
-  )
+    <main className="flex w-screen h-screen bg-[#313338] text-[#f2f3f5]">
+      <ServerBar />
+      <ChannelsBar />
+      <ChatBox />
+    </main>
+  );
 }
 
-export default App
+export default App;
