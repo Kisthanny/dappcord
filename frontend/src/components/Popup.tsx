@@ -14,7 +14,7 @@ const Popup = ({
   if (show) {
     return (
       <div
-        className="fixed w-screen h-screen z-[1000] flex items-center justify-center bg-black bg-opacity-70"
+        className="fixed top-0 left-0 bottom-0 right-0 w-screen h-screen z-[1000] flex items-center justify-center bg-black bg-opacity-70"
         onClick={closePopup}
       >
         <div
