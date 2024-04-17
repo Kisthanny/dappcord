@@ -5,7 +5,7 @@ import closeIdle from "../../../assets/close-73767D.svg";
 import React, { useEffect, useState } from "react";
 import { getServerContract } from "../libs";
 import { useAppDispatch } from "../../../hooks";
-import { addServer } from "../serverSlice";
+import { addServer, setCurrentServer } from "../serverSlice";
 export const SERVER_EXAMPLES = [
   "0x5FbDB2315678afecb367f032d93F642f64180aa3",
   "0x8464135c8F25Da09e49BC8782676a84730C318bC",
@@ -32,9 +32,7 @@ const AddServerPopup = ({
   const [serverSymbol, setServerSymbol] = useState("");
   const [serverAddress, setServerAddress] = useState("");
   const [inviteLinkError, setInviteLinkError] = useState("");
-  const createServer = () => {
-    console.log("createServer");
-  };
+  const createServer = () => {};
 
   const handleJoin = async () => {
     const res = await getServerContract(serverAddress);
@@ -43,6 +41,7 @@ const AddServerPopup = ({
     } else {
       setInviteLinkError("");
       dispatch(addServer(serverAddress));
+      dispatch(setCurrentServer(serverAddress));
       setShow(false);
     }
   };
