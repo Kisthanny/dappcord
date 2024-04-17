@@ -3,6 +3,9 @@ import arrowRight from "../../../assets/arrow-right-4D545E.svg";
 import closeActive from "../../../assets/close-DBDEE1.svg";
 import closeIdle from "../../../assets/close-73767D.svg";
 import React, { useEffect, useState } from "react";
+import { getServerContract } from "../libs";
+import { useAppDispatch } from "../../../hooks";
+import { addServer } from "../serverSlice";
 export const SERVER_EXAMPLES = [
   "0x5FbDB2315678afecb367f032d93F642f64180aa3",
   "0x8464135c8F25Da09e49BC8782676a84730C318bC",
@@ -21,20 +24,34 @@ const AddServerPopup = ({
   show: boolean;
   setShow: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const dispatch = useAppDispatch();
+
   const [step, setStep] = useState(Step.CREATE_YOUR_SERVER);
   const [onClose, setOnClose] = useState(false);
   const [serverName, setServerName] = useState("");
   const [serverSymbol, setServerSymbol] = useState("");
   const [serverAddress, setServerAddress] = useState("");
+  const [inviteLinkError, setInviteLinkError] = useState("");
   const createServer = () => {
     console.log("createServer");
   };
-  const joinServer = () => {
-    console.log("joinServer");
+
+  const handleJoin = async () => {
+    const res = await getServerContract(serverAddress);
+    if (res.code === 0) {
+      setInviteLinkError(res.message as string);
+    } else {
+      setInviteLinkError("");
+      dispatch(addServer(serverAddress));
+      setShow(false);
+    }
   };
   useEffect(() => {
     setStep(Step.CREATE_YOUR_SERVER);
   }, [show]);
+  useEffect(() => {
+    setInviteLinkError("");
+  }, [serverAddress]);
   return (
     <Popup show={show} setShow={setShow}>
       {step === Step.CREATE_YOUR_SERVER && (
@@ -201,6 +218,11 @@ const AddServerPopup = ({
                   setServerAddress(e.target.value);
                 }}
               />
+              {inviteLinkError && (
+                <p className="text-red-800 text-left text-sm font-semibold">
+                  {inviteLinkError}
+                </p>
+              )}
             </div>
             <h3 className="text-xs font-bold text-left w-full mb-2 text-[#b2b7be]">
               INVITES SHOULD LOOK LIKE
@@ -229,7 +251,7 @@ const AddServerPopup = ({
             </button>
             <button
               className="bg-[#5865f2] hover:bg-[#4752c4] py-2 px-7 rounded-sm"
-              onClick={joinServer}
+              onClick={handleJoin}
             >
               Join Server
             </button>

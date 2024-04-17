@@ -1,5 +1,22 @@
+import { useEffect, useState } from "react";
+import { getServerContract } from "../libs";
 import Icon, { IconType } from "./Icon";
-const ServerIcon = ({ name, symbol }: { name: string; symbol: string }) => {
+import { ethers } from "ethers";
+const ServerIcon = ({ address }: { address: string }) => {
+  const [name, setName] = useState("");
+  const [symbol, setSymbol] = useState("");
+  const initContract = async () => {
+    const res = await getServerContract(address);
+    if (res.code === 1) {
+      const contract = res.data as ethers.Contract;
+      setName(await contract.name());
+      setSymbol(await contract.symbol());
+    }
+  };
+  useEffect(() => {
+    initContract();
+  }, [address]);
+
   return <Icon type={IconType.TEXT} title={name} text={symbol} />;
 };
 

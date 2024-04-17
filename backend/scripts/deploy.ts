@@ -6,10 +6,10 @@ async function main() {
     const [sheldon, leonerd, raj, howard, penny] = await hre.ethers.getSigners();
     // deploy the server
     const DappcordServer = await hre.ethers.getContractFactory("DappcordServer");
-    const sheldonServer = await DappcordServer.connect(sheldon).deploy("SHELDONOPOLY", "S");
-    const leonerdServer = await DappcordServer.connect(leonerd).deploy("HOFSTATON", "H");
-    const rajServer = await DappcordServer.connect(raj).deploy("RAJMAHAH", "R");
-    const howardServer = await DappcordServer.connect(howard).deploy("WOLOWIZBURG", "W");
+    const sheldonServer = await DappcordServer.connect(sheldon).deploy("Sheldonopoly", "S");
+    const leonerdServer = await DappcordServer.connect(leonerd).deploy("Hofstaton", "H");
+    const rajServer = await DappcordServer.connect(raj).deploy("Rajmahah", "R");
+    const howardServer = await DappcordServer.connect(howard).deploy("Wolowizburg", "W");
 
     console.log('sheldon', await sheldonServer.getAddress())
     console.log('leonerd', await leonerdServer.getAddress())
