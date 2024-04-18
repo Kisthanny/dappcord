@@ -32,3 +32,10 @@ export async function getServerContract(address: string) {
         }
     }
 }
+export const getSigner = async () => {
+    if (window.ethereum === undefined) {
+        throw new Error('Please install Metamask')
+    }
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    return await provider.getSigner();
+}

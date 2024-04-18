@@ -81,7 +81,13 @@ describe("DappcordServer", function () {
                 const transaction = await dappcordServer.connect(owner).createChannel(CHANNEL_NAME, CHANNEL_TOPIC, CHANNEL_TYPE, CHANNEL_FEE, CATEGORY_ID)
                 await transaction.wait();
             })
-            it('Updates Channel ID List', async () => {
+
+            it("Updates Channel ID List", async () => {
+                const channelIdList = await dappcordServer.getChannelIdList(CATEGORY_ID);
+                expect(channelIdList[0]).equal(CHANNEL_ID)
+            })
+
+            it('Updates Channel Mapping', async () => {
                 const channel = await dappcordServer.channelMapping(CHANNEL_ID)
                 expect(channel.channelId).equal(CHANNEL_ID);
                 expect(channel.channelName).equal(CHANNEL_NAME);

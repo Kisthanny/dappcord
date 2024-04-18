@@ -13,6 +13,7 @@ const Icon = ({
   idleBackground = "#313338",
   activeBackground = "#5865f2",
   onClick,
+  fixedSelected = false,
 }: {
   type: IconType;
   idleImg?: string;
@@ -22,6 +23,7 @@ const Icon = ({
   idleBackground?: string;
   activeBackground?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
+  fixedSelected?: boolean;
 }) => {
   const idleBg = {
     background: idleBackground,
@@ -60,7 +62,9 @@ const Icon = ({
   return (
     <div className="relative flex items-center justify-center py-1">
       <button
-        className={`w-[50px] h-[50px] flex items-center justify-center transition ease-in rounded-full hover:rounded-2xl p-4`}
+        className={`w-[50px] h-[50px] flex items-center justify-center transition ease-in ${
+          fixedSelected ? "rounded-2xl" : "rounded-full hover:rounded-2xl"
+        } p-4`}
         style={isHovered ? activeBg : idleBg}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}

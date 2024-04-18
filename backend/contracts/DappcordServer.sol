@@ -55,6 +55,14 @@ contract DappcordServer is ERC721 {
         return categoryIdList;
     }
 
+    function getChannelIdList(uint256 _categoryId)public view returns(uint256[] memory) {
+        return categoryMapping[_categoryId].channelIdList;
+    }
+
+    function getMemberList(uint256 _channelId)public view returns(address[] memory) {
+        return channelMapping[_channelId].memberList;
+    }
+
     function hasCategory(uint256 _categoryId) private view returns (bool) {
         if (categoryMapping[_categoryId].categoryId > 10000) {
             return true;
