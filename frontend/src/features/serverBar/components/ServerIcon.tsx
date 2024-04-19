@@ -1,42 +1,29 @@
 import { useEffect, useState } from "react";
-import { getServerContract } from "../libs";
+import { Server } from "../../../libs";
 import Icon, { IconType } from "./Icon";
-import { ethers } from "ethers";
 import { setCurrentServer } from "../../../store/serverSlice";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
-const ServerIcon = ({ address }: { address: string }) => {
+const ServerIcon = ({ server }: { server: Server }) => {
   const currentServer = useAppSelector((state) => state.server.currentServer);
   const dispatch = useAppDispatch();
-  const [name, setName] = useState("");
-  const [symbol, setSymbol] = useState("");
   const [isCurrentServer, setIsCurrentServer] = useState(false);
-  const initContract = async () => {
-    const res = await getServerContract(address);
-    if (res.code === 1) {
-      const contract = res.data as ethers.Contract;
-      setName(await contract.name());
-      setSymbol(await contract.symbol());
-    }
-  };
-  useEffect(() => {
-    initContract();
-  }, [address]);
 
   useEffect(() => {
     setIsCurrentServer(
-      currentServer.toLocaleLowerCase() === address.toLocaleLowerCase()
+      currentServer?.address.toLocaleLowerCase() ===
+        server.address.toLocaleLowerCase()
     );
   }, [currentServer]);
 
   return (
     <Icon
       type={IconType.TEXT}
-      title={name}
-      text={symbol}
+      title={server.name}
+      text={server.symbol}
       idleBackground={isCurrentServer ? "#5865f2" : undefined}
       fixedSelected={isCurrentServer}
       onClick={() => {
-        dispatch(setCurrentServer(address));
+        dispatch(setCurrentServer(server.address));
       }}
     />
   );

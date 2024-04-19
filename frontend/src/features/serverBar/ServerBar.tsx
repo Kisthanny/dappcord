@@ -7,9 +7,9 @@ const ServerBar = () => {
   return (
     <section className="bg-[#1e1f22] h-full w-[73px]">
       <ul>
-        {serverList.map((address) => (
-          <li key={address}>
-            <ServerIcon address={address} />
+        {serverList.map((server) => (
+          <li key={server.address}>
+            <ServerIcon server={server} />
           </li>
         ))}
         <li>

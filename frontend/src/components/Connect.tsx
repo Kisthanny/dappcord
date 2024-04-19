@@ -1,6 +1,6 @@
 import { useAppSelector } from "../hooks";
 const Connect = () => {
-  const currentSigner = useAppSelector((state) => state.account.currentSigner);
+  const currentWalletAddress = useAppSelector((state) => state.account.currentWalletAddress);
   const handleConnect = async () => {
     try {
       const ethereum = window.ethereum;
@@ -23,7 +23,7 @@ const Connect = () => {
       onClick={handleConnect}
       className="bg-[#313338] hover:bg-[#23a559] text-[#23a559] hover:text-white transition ease-in px-4 py-2 rounded-md font-semibold"
     >
-      {currentSigner ? addressFilter(currentSigner.address) : "connect"}
+      {currentWalletAddress ? addressFilter(currentWalletAddress) : "connect"}
     </button>
   );
 };

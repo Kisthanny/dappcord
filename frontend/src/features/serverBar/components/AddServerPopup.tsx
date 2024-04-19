@@ -3,7 +3,6 @@ import arrowRight from "../../../assets/arrow-right-4D545E.svg";
 import closeActive from "../../../assets/close-DBDEE1.svg";
 import closeIdle from "../../../assets/close-73767D.svg";
 import React, { useEffect, useState } from "react";
-import { getServerContract } from "../libs";
 import { useAppDispatch } from "../../../hooks";
 import { addServer, setCurrentServer } from "../../../store/serverSlice";
 export const SERVER_EXAMPLES = [
@@ -35,14 +34,13 @@ const AddServerPopup = ({
   const createServer = () => {};
 
   const handleJoin = async () => {
-    const res = await getServerContract(serverAddress);
-    if (res.code === 0) {
-      setInviteLinkError(res.message as string);
-    } else {
-      setInviteLinkError("");
-      dispatch(addServer(serverAddress));
+    try {
+      await dispatch(addServer(serverAddress));
       dispatch(setCurrentServer(serverAddress));
+      setInviteLinkError("");
       setShow(false);
+    } catch (error) {
+      setInviteLinkError((error as Error).message);
     }
   };
   useEffect(() => {

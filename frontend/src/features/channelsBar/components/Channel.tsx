@@ -1,7 +1,8 @@
-import { ethers, BigNumberish } from "ethers";
+import { BigNumberish } from "ethers";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { setCurrentChannel } from "../../../store/channelSlice";
 import { useEffect, useState } from "react";
+import { Channel as ChannelType } from "../../../libs";
 
 export type Channel = {
   channelId: BigNumberish;
@@ -49,10 +50,8 @@ const textIcon = (
 
 const Channel = ({
   channel,
-  contract,
 }: {
-  channel: Channel;
-  contract: ethers.Contract;
+  channel: ChannelType;
 }) => {
   const [isCurrent, setIsCurrent] = useState(false);
   const currentChannel = useAppSelector(
@@ -80,7 +79,7 @@ const Channel = ({
       }`}
     >
       <div className="flex items-center gap-2">
-        {channel.channelType === 0n ? textIcon : voiceIcon}
+        {channel.channelType === 0 ? textIcon : voiceIcon}
         <span>{channel.channelName}</span>
       </div>
     </button>

@@ -1,9 +1,9 @@
 import Popup from "../../../components/Popup";
 import React, { useState } from "react";
-import { useAppSelector } from "../../../hooks";
-import { BigNumberish, ethers } from "ethers";
-import { getServerContract, getSigner } from "../../serverBar/libs";
-import { Contract } from "ethers";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
+import { BigNumberish } from "ethers";
+import { getServerContract, getSigner } from "../../../libs";
+import { updateServer } from "../../../store/serverSlice";
 const voiceIcon = (size: number) => (
   <svg
     className="icon flex-shrink-0"
@@ -100,17 +100,17 @@ const AddChannelPopup = ({
   show: boolean;
   setShow: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const dispatch = useAppDispatch();
   const [channelType, setChannelType] = useState(0);
   const [channelName, setChannelName] = useState("");
   const [channelTopic, setChannelTopic] = useState("");
   const [channelFee, setChannelFee] = useState(0);
   const currentServer = useAppSelector((state) => state.server.currentServer);
   const createChannel = async () => {
-    const res = await getServerContract(currentServer);
-    if (res.code === 1) {
-      const contract = res.data as Contract;
-      const signer = await getSigner();
-      contract
+    if (currentServer) {
+      const contract = await getServerContract(currentServer.address);
+      const signer = await getSigner()
+      const transaction = await contract
         .connect(signer)
         .createChannel(
           channelName,
@@ -119,6 +119,9 @@ const AddChannelPopup = ({
           channelFee,
           categoryId
         );
+      await transaction.wait();
+      await dispatch(updateServer(currentServer.address));
+      setShow(false);
     }
   };
   return (

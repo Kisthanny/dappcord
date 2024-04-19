@@ -1,54 +1,19 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { FullCategory } from "./Channels";
-import Channel, { Channel as ChannelType } from "./Channel";
-import { ethers } from "ethers";
+import { Dispatch, SetStateAction, useState } from "react";
+import Channel from "./Channel";
+import { Category as CategoryType } from "../../../libs";
 const Category = ({
   category,
-  contract,
   setAddCategoryId,
 }: {
-  category: FullCategory;
-  contract: ethers.Contract;
+  category: CategoryType;
   setAddCategoryId: Dispatch<SetStateAction<string | number | bigint>>;
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [channelList, setChannelList] = useState([] as ChannelType[]);
-
-  const fetchChannelList = async () => {
-    const result: ChannelType[] = [];
-    for (let i = 0; i < category.channelIdList.length; i++) {
-      const _channelId = category.channelIdList[i];
-      const {
-        channelId,
-        channelName,
-        channelTopic,
-        channelType,
-        channelFee,
-        categoryId,
-      } = await contract.channelMapping(_channelId);
-      const memberList = await contract.getMemberList(_channelId);
-      const channel = {
-        channelId,
-        channelName,
-        channelTopic,
-        channelType,
-        channelFee,
-        categoryId,
-        memberList,
-      } as ChannelType;
-      result.push(channel);
-    }
-    setChannelList(result);
-  };
 
   const createChannel = () => {
     console.log("create channel");
     setAddCategoryId(category.categoryId);
   };
-
-  useEffect(() => {
-    fetchChannelList();
-  }, [category]);
   return (
     <div>
       <button
@@ -99,9 +64,9 @@ const Category = ({
       </button>
       {isExpanded && (
         <ul>
-          {channelList.map((channel) => (
+          {category.channelList.map((channel) => (
             <li key={channel.channelId} className="px-3">
-              <Channel channel={channel} contract={contract} />
+              <Channel channel={channel} />
             </li>
           ))}
         </ul>

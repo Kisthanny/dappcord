@@ -1,20 +1,19 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getSigner } from "../features/serverBar/libs";
-import { ethers } from "ethers";
+import { getSigner } from "../libs";
 
 interface AccountState {
-    currentSigner: ethers.JsonRpcSigner | null
+    currentWalletAddress: string
 }
 
 const initialState: AccountState = {
-    currentSigner: null
+    currentWalletAddress: ''
 }
 
 export const setCurrentSigner = createAsyncThunk(
     'account/setCurrentSigner',
     async () => {
         const signer = await getSigner();
-        return signer;
+        return signer.address;
     }
 );
 
@@ -25,7 +24,7 @@ export const accountSlice = createSlice({
     },
     extraReducers: builder => {
         builder.addCase(setCurrentSigner.fulfilled, (state, action) => {
-            state.currentSigner = action.payload
+            state.currentWalletAddress = action.payload
         })
     }
 })
