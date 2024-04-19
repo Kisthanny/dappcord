@@ -1,6 +1,6 @@
 import { ethers, BigNumberish } from "ethers";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { setCurrentChannel } from "../channelSlice";
+import { setCurrentChannel } from "../../../store/channelSlice";
 import { useEffect, useState } from "react";
 
 export type Channel = {

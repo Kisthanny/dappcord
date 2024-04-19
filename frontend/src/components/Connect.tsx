@@ -1,20 +1,15 @@
-import { useAppDispatch, useAppSelector } from "../hooks";
-import { setCurrentAddress } from "./accountSlice";
+import { useAppSelector } from "../hooks";
 const Connect = () => {
-  const currentAddress = useAppSelector(
-    (state) => state.account.currentAddress
-  );
-  const dispatch = useAppDispatch();
+  const currentSigner = useAppSelector((state) => state.account.currentSigner);
   const handleConnect = async () => {
     try {
       const ethereum = window.ethereum;
       if (ethereum === undefined) {
         throw new Error("Please install Metamask");
       }
-      const result: string[] = await ethereum.request({
+      await ethereum.request({
         method: "eth_requestAccounts",
       });
-      dispatch(setCurrentAddress(result[0]));
     } catch (error) {}
   };
   const addressFilter = (address: string) => {
@@ -28,7 +23,7 @@ const Connect = () => {
       onClick={handleConnect}
       className="bg-[#313338] hover:bg-[#23a559] text-[#23a559] hover:text-white transition ease-in px-4 py-2 rounded-md font-semibold"
     >
-      {currentAddress === "0x" ? "connect" : addressFilter(currentAddress)}
+      {currentSigner ? addressFilter(currentSigner.address) : "connect"}
     </button>
   );
 };

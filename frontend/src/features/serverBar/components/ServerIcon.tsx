@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getServerContract } from "../libs";
 import Icon, { IconType } from "./Icon";
 import { ethers } from "ethers";
-import { setCurrentServer } from "../serverSlice";
+import { setCurrentServer } from "../../../store/serverSlice";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 const ServerIcon = ({ address }: { address: string }) => {
   const currentServer = useAppSelector((state) => state.server.currentServer);

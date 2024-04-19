@@ -3,11 +3,11 @@ import ChannelsBar from "./features/channelsBar/ChannelsBar";
 import ChatBox from "./features/chatbox/ChatBox";
 import ServerBar from "./features/serverBar/ServerBar";
 import { useAppDispatch } from "./hooks";
-import { setCurrentAddress } from "./components/accountSlice";
+import { setCurrentSigner } from "./store/accountSlice";
 function App() {
   const dispatch = useAppDispatch();
-  const handleAccountChanged = (accounts: string[]) => {
-    dispatch(setCurrentAddress(accounts[0]));
+  const handleAccountChanged = () => {
+    dispatch(setCurrentSigner());
   };
   const onMounted = async () => {
     try {
@@ -19,7 +19,7 @@ function App() {
         method: "eth_accounts",
       });
       if (result.length) {
-        dispatch(setCurrentAddress(result[0]));
+        dispatch(setCurrentSigner());
       }
 
       ethereum.on("accountsChanged", handleAccountChanged);
