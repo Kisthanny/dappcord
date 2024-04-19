@@ -105,9 +105,6 @@ const AddChannelPopup = ({
   const [channelTopic, setChannelTopic] = useState("");
   const [channelFee, setChannelFee] = useState(0);
   const currentServer = useAppSelector((state) => state.server.currentServer);
-  const currentWalletAddress = useAppSelector(
-    (state) => state.account.currentAddress
-  );
   const createChannel = async () => {
     const res = await getServerContract(currentServer);
     if (res.code === 1) {
