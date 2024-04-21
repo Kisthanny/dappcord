@@ -1,8 +1,6 @@
-import Popup from "../../../components/Popup";
+import { showPopup, closePopup, CloseIcon } from "../../../components/Popup";
 import arrowRight from "../../../assets/arrow-right-4D545E.svg";
-import closeActive from "../../../assets/close-DBDEE1.svg";
-import closeIdle from "../../../assets/close-73767D.svg";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch } from "../../../hooks";
 import { addServer, setCurrentServer } from "../../../store/serverSlice";
 export const SERVER_EXAMPLES = [
@@ -16,17 +14,11 @@ export enum Step {
   "CUSTOMIZE_YOUR_SERVER" = "Customize-Your-Server",
   "JOIN_A_SERVER" = "Join-a-Server",
 }
-const AddServerPopup = ({
-  show,
-  setShow,
-}: {
-  show: boolean;
-  setShow: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+
+const AddServer = () => {
   const dispatch = useAppDispatch();
 
   const [step, setStep] = useState(Step.CREATE_YOUR_SERVER);
-  const [onClose, setOnClose] = useState(false);
   const [serverName, setServerName] = useState("");
   const [serverSymbol, setServerSymbol] = useState("");
   const [serverAddress, setServerAddress] = useState("");
@@ -38,40 +30,19 @@ const AddServerPopup = ({
       await dispatch(addServer(serverAddress));
       dispatch(setCurrentServer(serverAddress));
       setInviteLinkError("");
-      setShow(false);
+      closePopup();
     } catch (error) {
       setInviteLinkError((error as Error).message);
     }
   };
   useEffect(() => {
-    setStep(Step.CREATE_YOUR_SERVER);
-  }, [show]);
-  useEffect(() => {
     setInviteLinkError("");
   }, [serverAddress]);
   return (
-    <Popup show={show} setShow={setShow}>
+    <>
       {step === Step.CREATE_YOUR_SERVER && (
         <div className="relative bg-[#313338] w-[442px] rounded-md">
-          <button
-            onClick={() => {
-              setShow(false);
-            }}
-            className="absolute right-5 top-5"
-          >
-            <img
-              onMouseEnter={() => {
-                setOnClose(true);
-              }}
-              onMouseLeave={() => {
-                setOnClose(false);
-              }}
-              width={18}
-              height={18}
-              src={onClose ? closeActive : closeIdle}
-              alt="close"
-            />
-          </button>
+          <CloseIcon />
 
           <div className="flex flex-col items-center text-center pt-[24px] px-[18px] pb-[10px]">
             <h1 className="text-2xl font-bold mb-1">Create Your Server</h1>
@@ -106,25 +77,7 @@ const AddServerPopup = ({
       )}
       {step === Step.CUSTOMIZE_YOUR_SERVER && (
         <div className="relative bg-[#313338] w-[442px] rounded-md">
-          <button
-            onClick={() => {
-              setShow(false);
-            }}
-            className="absolute right-5 top-5"
-          >
-            <img
-              onMouseEnter={() => {
-                setOnClose(true);
-              }}
-              onMouseLeave={() => {
-                setOnClose(false);
-              }}
-              width={18}
-              height={18}
-              src={onClose ? closeActive : closeIdle}
-              alt="close"
-            />
-          </button>
+          <CloseIcon />
 
           <div className="flex flex-col items-center text-center pt-[24px] px-[18px] pb-[10px]">
             <h1 className="text-2xl font-bold mb-1">Customize Your Server</h1>
@@ -177,25 +130,7 @@ const AddServerPopup = ({
       )}
       {step === Step.JOIN_A_SERVER && (
         <div className="relative bg-[#313338] w-[442px] rounded-md">
-          <button
-            onClick={() => {
-              setShow(false);
-            }}
-            className="absolute right-5 top-5"
-          >
-            <img
-              onMouseEnter={() => {
-                setOnClose(true);
-              }}
-              onMouseLeave={() => {
-                setOnClose(false);
-              }}
-              width={18}
-              height={18}
-              src={onClose ? closeActive : closeIdle}
-              alt="close"
-            />
-          </button>
+          <CloseIcon />
 
           <div className="flex flex-col items-center text-center pt-[24px] px-[18px] pb-[10px]">
             <h1 className="text-2xl font-bold mb-1">Join a Server</h1>
@@ -255,8 +190,12 @@ const AddServerPopup = ({
           </div>
         </div>
       )}
-    </Popup>
+    </>
   );
 };
 
-export default AddServerPopup;
+const showAddServerPopup = () => {
+  showPopup(<AddServer />);
+};
+
+export default showAddServerPopup;

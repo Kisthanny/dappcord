@@ -1,9 +1,10 @@
-import Popup from "../../../components/Popup";
-import React, { useState } from "react";
+import { showPopup, closePopup, CloseIcon } from "../../../components/Popup";
+import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { BigNumberish } from "ethers";
 import { getServerContract, getSigner } from "../../../libs";
 import { updateServer } from "../../../store/serverSlice";
+import MyInput from "../../../components/MyInput";
 const voiceIcon = (size: number) => (
   <svg
     className="icon flex-shrink-0"
@@ -37,25 +38,6 @@ const textIcon = (size: number) => (
       p-id="10368"
     ></path>
   </svg>
-);
-const closeIcon = (
-  <div className="fill-[#73767d] hover:fill-[#dbdee1]">
-    <svg
-      className="icon"
-      viewBox="0 0 1024 1024"
-      version="1.1"
-      xmlns="http://www.w3.org/2000/svg"
-      p-id="8427"
-      width="18"
-      height="18"
-    >
-      <path
-        d="M877.216 491.808M575.328 510.496 946.784 140.672c17.568-17.504 17.664-45.824 0.192-63.424-17.504-17.632-45.792-17.664-63.36-0.192L512.032 446.944 143.712 77.216C126.304 59.712 97.92 59.648 80.384 77.12 62.848 94.624 62.816 123.008 80.288 140.576l368.224 369.632L77.216 879.808c-17.568 17.504-17.664 45.824-0.192 63.424 8.736 8.8 20.256 13.216 31.776 13.216 11.424 0 22.848-4.352 31.584-13.056l371.36-369.696 371.68 373.088C892.192 955.616 903.68 960 915.168 960c11.456 0 22.912-4.384 31.648-13.088 17.504-17.504 17.568-45.824 0.096-63.392L575.328 510.496 575.328 510.496zM575.328 510.496"
-        className="fill-inherit"
-        p-id="8428"
-      ></path>
-    </svg>
-  </div>
 );
 const radioSelect = (
   <svg
@@ -91,15 +73,7 @@ const radioUnselect = (
     ></path>
   </svg>
 );
-const AddChannelPopup = ({
-  categoryId,
-  show,
-  setShow,
-}: {
-  categoryId: BigNumberish;
-  show: boolean;
-  setShow: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+const AddChannel = ({ categoryId }: { categoryId: BigNumberish }) => {
   const dispatch = useAppDispatch();
   const [channelType, setChannelType] = useState(0);
   const [channelName, setChannelName] = useState("");
@@ -109,7 +83,7 @@ const AddChannelPopup = ({
   const createChannel = async () => {
     if (currentServer) {
       const contract = await getServerContract(currentServer.address);
-      const signer = await getSigner()
+      const signer = await getSigner();
       const transaction = await contract
         .connect(signer)
         .createChannel(
@@ -121,114 +95,94 @@ const AddChannelPopup = ({
         );
       await transaction.wait();
       await dispatch(updateServer(currentServer.address));
-      setShow(false);
+      closePopup();
     }
   };
-  return (
-    <Popup show={show} setShow={setShow}>
-      <div className="relative bg-[#313338] w-[472px] rounded-md">
-        <button
-          onClick={() => {
-            setShow(false);
-          }}
-          className="absolute right-5 top-5"
-        >
-          {closeIcon}
-        </button>
 
-        <div className="flex flex-col items-center text-center pt-[24px] px-[14px] pb-[10px]">
-          <h1 className="text-2xl font-bold mb-1">Create Channel</h1>
-          <h4 className="text-left w-full text-xs font-bold text-[#b5bac1] mb-2">
-            CHANNEL TYPE
-          </h4>
-          <button
-            className={`mb-2 text-[#d2d5d8] flex items-center justify-between gap-2 w-full rounded-md px-3 py-2 ${
-              channelType === 0
-                ? "bg-[#43444b] fill-[#b4b4b7]"
-                : "bg-[#2b2d31] hover:bg-[#393c41] fill-[#7e8288] hover:fill-[#9a9da1]"
-            } transition-colors ease-in-out`}
-            onClick={setChannelType.bind(null, 0)}
-          >
-            {textIcon(28)}
-            <div className="flex flex-col items-start text-left">
-              <span className="font-semibold">Text</span>
-              <p className="text-[#b5bac1] text-sm text-nowrap">
-                Send messages, Images, GIFs, emoji, opinions, and puns
-              </p>
-            </div>
-            {channelType === 0 ? radioSelect : radioUnselect}
-          </button>
-          <button
-            className={`mb-2 text-[#d2d5d8] flex items-center justify-between gap-2 w-full rounded-md px-3 py-2 ${
-              channelType === 1
-                ? "bg-[#43444b] fill-[#b4b4b7]"
-                : "bg-[#2b2d31] hover:bg-[#393c41] fill-[#7e8288] hover:fill-[#9a9da1]"
-            } transition-colors ease-in-out`}
-            onClick={setChannelType.bind(null, 1)}
-          >
-            {voiceIcon(28)}
-            <div className="flex flex-col items-start text-left">
-              <span className="font-semibold">Voice</span>
-              <p className="text-[#b5bac1] text-sm text-nowrap">
-                Hang out together with voice, video, and screen share
-              </p>
-            </div>
-            {channelType === 1 ? radioSelect : radioUnselect}
-          </button>
-          <h4 className="text-left w-full text-xs font-bold text-[#dbdee1] my-2">
-            CHANNEL NAME
-          </h4>
-          <div className="fill-[#dbdee1] flex items-center gap-1 w-full bg-[#1e1f22] p-2 rounded-md">
-            {channelType === 0 ? textIcon(16) : voiceIcon(16)}
-            <input
-              className="bg-transparent text-[#dbdee1] outline-none"
-              type="text"
-              placeholder="new-channel"
-              value={channelName}
-              onChange={(e) => setChannelName(e.target.value)}
-            />
+  return (
+    <div className="relative bg-[#313338] w-[472px] rounded-md">
+      <CloseIcon />
+
+      <div className="flex flex-col items-center text-center pt-[24px] px-[14px] pb-[10px]">
+        <h1 className="text-2xl font-bold mb-1">Create Channel</h1>
+        <h4 className="text-left w-full text-xs font-bold text-[#b5bac1] mb-2">
+          CHANNEL TYPE
+        </h4>
+        <button
+          className={`mb-2 text-[#d2d5d8] flex items-center justify-between gap-2 w-full rounded-md px-3 py-2 ${
+            channelType === 0
+              ? "bg-[#43444b] fill-[#b4b4b7]"
+              : "bg-[#2b2d31] hover:bg-[#393c41] fill-[#7e8288] hover:fill-[#9a9da1]"
+          } transition-colors ease-in-out`}
+          onClick={setChannelType.bind(null, 0)}
+        >
+          {textIcon(28)}
+          <div className="flex flex-col items-start text-left">
+            <span className="font-semibold">Text</span>
+            <p className="text-[#b5bac1] text-sm text-nowrap">
+              Send messages, Images, GIFs, emoji, opinions, and puns
+            </p>
           </div>
-          <h4 className="text-left w-full text-xs font-bold text-[#dbdee1] my-2">
-            CHANNEL TOPIC
-          </h4>
-          <div className="fill-[#dbdee1] flex items-center gap-1 w-full bg-[#1e1f22] p-2 rounded-md">
-            {channelType === 0 ? textIcon(16) : voiceIcon(16)}
-            <input
-              className="bg-transparent text-[#dbdee1] outline-none"
-              type="text"
-              placeholder="it's-about"
-              value={channelTopic}
-              onChange={(e) => setChannelTopic(e.target.value)}
-            />
+          {channelType === 0 ? radioSelect : radioUnselect}
+        </button>
+        <button
+          className={`mb-2 text-[#d2d5d8] flex items-center justify-between gap-2 w-full rounded-md px-3 py-2 ${
+            channelType === 1
+              ? "bg-[#43444b] fill-[#b4b4b7]"
+              : "bg-[#2b2d31] hover:bg-[#393c41] fill-[#7e8288] hover:fill-[#9a9da1]"
+          } transition-colors ease-in-out`}
+          onClick={setChannelType.bind(null, 1)}
+        >
+          {voiceIcon(28)}
+          <div className="flex flex-col items-start text-left">
+            <span className="font-semibold">Voice</span>
+            <p className="text-[#b5bac1] text-sm text-nowrap">
+              Hang out together with voice, video, and screen share
+            </p>
           </div>
-          <h4 className="text-left w-full text-xs font-bold text-[#dbdee1] my-2">
-            CHANNEL FEE
-          </h4>
-          <div className="fill-[#dbdee1] flex items-center gap-1 w-full bg-[#1e1f22] p-2 rounded-md">
-            <span className="font-bold text-xs">ETH</span>
-            <input
-              className="bg-transparent text-[#dbdee1] outline-none"
-              type="number"
-              placeholder="0"
-              value={channelFee}
-              onChange={(e) => setChannelFee(Number(e.target.value))}
-            />
-          </div>
-        </div>
-        <div className="flex items-center justify-end gap-6 pt-[12px] px-[18px] pb-[18px] bg-[#2b2d31]">
-          <button className="font-semibold" onClick={setShow.bind(null, false)}>
-            Cancel
-          </button>
-          <button
-            className="text-white bg-[#5865f2] hover:bg-[#4752c4] active:bg-[#3c45a5] px-4 rounded-sm py-2 font-semibold transition-colors ease-in-out"
-            onClick={createChannel}
-          >
-            Create Channel
-          </button>
-        </div>
+          {channelType === 1 ? radioSelect : radioUnselect}
+        </button>
+        <MyInput
+          type="text"
+          placeholder="new-channel"
+          name="CHANNEL NAME"
+          className="bg-black"
+          value={channelName}
+          onChange={(e) => setChannelName(e.target.value)}
+        />
+        <MyInput
+          type="text"
+          placeholder="it's-about"
+          name="CHANNEL TOPIC"
+          className="bg-black"
+          value={channelTopic}
+          onChange={(e) => setChannelTopic(e.target.value)}
+        />
+        <MyInput
+          type="number"
+          name="CHANNEL FEE"
+          className="bg-black"
+          value={channelFee}
+          onChange={(e) => setChannelFee(Number(e.target.value))}
+        />
       </div>
-    </Popup>
+      <div className="flex items-center justify-end gap-6 pt-[12px] px-[18px] pb-[18px] bg-[#2b2d31]">
+        <button className="font-semibold" onClick={closePopup}>
+          Cancel
+        </button>
+        <button
+          className="text-white bg-[#5865f2] hover:bg-[#4752c4] active:bg-[#3c45a5] px-4 rounded-sm py-2 font-semibold transition-colors ease-in-out"
+          onClick={createChannel}
+        >
+          Create Channel
+        </button>
+      </div>
+    </div>
   );
 };
 
-export default AddChannelPopup;
+const showAddChannelPop = (categoryId: BigNumberish): void => {
+  showPopup(<AddChannel categoryId={categoryId} />);
+};
+
+export default showAddChannelPop;

@@ -48,8 +48,9 @@ export const serverSlice = createSlice({
     },
     extraReducers: builder => {
         builder.addCase(addServer.fulfilled, (state, action) => {
-            if (action.payload) {
-                state.serverList.push(action.payload)
+            const server = action.payload;
+            if (server && state.serverList.findIndex(e => e.address === server.address) === -1) {
+                state.serverList.push(server)
             }
         })
         builder.addCase(updateServer.fulfilled, (state, action) => {

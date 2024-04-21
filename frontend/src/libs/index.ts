@@ -65,27 +65,23 @@ export const getServerInfo = async (contract: DappcordServer) => {
 }
 
 export const getCategoryList = async (contract: DappcordServer) => {
-    const result: Category[] = [];
     const categoryIdList = await contract.getCategoryIdList();
-    for (let index = 0; index < categoryIdList.length; index++) {
-        const categoryId = categoryIdList[index];
+    const promiseList = categoryIdList.map(async (categoryId) => {
         const category = await contract.categoryMapping(categoryId)
-        result.push({
+        return {
             categoryId: category.categoryId.toString(),
             categoryName: category.categoryName,
             channelList: await getChannelList(contract, categoryId.toString())
-        })
-    }
-    return result;
+        }
+    })
+    return await Promise.all(promiseList)
 }
 
 export const getChannelList = async (contract: DappcordServer, categoryId: string) => {
-    const result: Channel[] = [];
     const channelIdList = await contract.getChannelIdList(categoryId);
-    for (let index = 0; index < channelIdList.length; index++) {
-        const channelId = channelIdList[index];
+    const promiseList = channelIdList.map(async (channelId) => {
         const channel = await contract.channelMapping(channelId)
-        result.push({
+        return {
             channelId: channel.channelId.toString(),
             channelName: channel.channelName,
             channelTopic: channel.channelTopic,
@@ -93,7 +89,7 @@ export const getChannelList = async (contract: DappcordServer, categoryId: strin
             channelFee: channel.channelFee.toString(),
             categoryId: channel.categoryId.toString(),
             memberList: await contract.getMemberList(channelId)
-        })
-    }
-    return result;
+        }
+    })
+    return await Promise.all(promiseList)
 }

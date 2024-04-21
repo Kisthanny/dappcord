@@ -29,7 +29,7 @@ function App() {
     onMounted();
   }, []);
   return (
-    <main className="flex w-screen h-screen bg-[#313338] text-[#f2f3f5]">
+    <main id="main" className="flex w-screen h-screen bg-[#313338] text-[#f2f3f5]">
       <ServerBar />
       <ChannelsBar />
       <ChatBox />

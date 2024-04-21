@@ -1,18 +1,12 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import Channel from "./Channel";
 import { Category as CategoryType } from "../../../libs";
-const Category = ({
-  category,
-  setAddCategoryId,
-}: {
-  category: CategoryType;
-  setAddCategoryId: Dispatch<SetStateAction<string | number | bigint>>;
-}) => {
+import showAddChannelPop from "./AddChannelPopup";
+const Category = ({ category }: { category: CategoryType }) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const createChannel = () => {
-    console.log("create channel");
-    setAddCategoryId(category.categoryId);
+    showAddChannelPop(category.categoryId);
   };
   return (
     <div>
