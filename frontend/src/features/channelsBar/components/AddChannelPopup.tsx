@@ -73,13 +73,19 @@ const radioUnselect = (
     ></path>
   </svg>
 );
-const AddChannel = ({ categoryId }: { categoryId: BigNumberish }) => {
+const AddChannel = ({
+  defaultCategoryId,
+}: {
+  defaultCategoryId: BigNumberish;
+}) => {
   const dispatch = useAppDispatch();
+  const [categoryId, setCategoryId] = useState(defaultCategoryId.toString());
   const [channelType, setChannelType] = useState(0);
   const [channelName, setChannelName] = useState("");
   const [channelTopic, setChannelTopic] = useState("");
   const [channelFee, setChannelFee] = useState(0);
   const currentServer = useAppSelector((state) => state.server.currentServer);
+  const categoryList = currentServer?.categoryList || [];
   const createChannel = async () => {
     if (currentServer) {
       const contract = await getServerContract(currentServer.address);
@@ -105,6 +111,32 @@ const AddChannel = ({ categoryId }: { categoryId: BigNumberish }) => {
 
       <div className="flex flex-col items-center text-center pt-[24px] px-[14px] pb-[10px]">
         <h1 className="text-2xl font-bold mb-1">Create Channel</h1>
+        <h4 className="text-left w-full text-xs font-bold text-[#b5bac1] mb-2">
+          SELECT CATEGORY
+        </h4>
+        <div className="w-full text-xs bg-[#1e1f22] p-2 rounded-md mb-2">
+          <select
+            name="category"
+            id="new-channel-select-category"
+            className="w-full bg-transparent text-[#dbdee1] outline-none"
+            defaultValue={categoryId}
+            onChange={(e) => {
+              console.log(e.target.value);
+              setCategoryId(e.target.value);
+            }}
+          >
+            {categoryList.map((category) => (
+              <option
+                className="bg-[#2b2d31]"
+                key={category.categoryId}
+                value={category.categoryId}
+              >
+                {category.categoryName}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <h4 className="text-left w-full text-xs font-bold text-[#b5bac1] mb-2">
           CHANNEL TYPE
         </h4>
@@ -181,8 +213,8 @@ const AddChannel = ({ categoryId }: { categoryId: BigNumberish }) => {
   );
 };
 
-const showAddChannelPop = (categoryId: BigNumberish): void => {
-  showPopup(<AddChannel categoryId={categoryId} />);
+const showAddChannelPop = (defaultCategoryId: BigNumberish): void => {
+  showPopup(<AddChannel defaultCategoryId={defaultCategoryId} />);
 };
 
 export default showAddChannelPop;

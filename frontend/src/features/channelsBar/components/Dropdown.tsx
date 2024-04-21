@@ -4,6 +4,8 @@ import createChannel from "../../../assets/create-channel-b5bac1.svg";
 import createFolder from "../../../assets/create-folder-b5bac1.svg";
 import { useState } from "react";
 import { useAppSelector } from "../../../hooks";
+import showAddCategoryPop from "./AddCategoryPopup";
+import showAddChannelPop from "./AddChannelPopup";
 
 const Dropdown = () => {
   const currentServer = useAppSelector((state) => state.server.currentServer);
@@ -19,6 +21,14 @@ const Dropdown = () => {
     if (!isExpanded) {
       document.addEventListener("mouseup", closePopupListener);
     }
+  };
+  const handleCreateChannel = () => {
+    const categoryList = currentServer?.categoryList || [];
+    if (!categoryList.length) {
+      showAddCategoryPop();
+      return;
+    }
+    showAddChannelPop(categoryList[0].categoryId);
   };
   return (
     <div className="absolute z-10 left-0 top-0 right-0 h-[50px]">
@@ -45,7 +55,7 @@ const Dropdown = () => {
         <ul className="bg-[#111214] px-2 py-2 rounded-md shadow-xl shadow-stone-900">
           <li className="">
             <button
-              onClick={() => {}}
+              onClick={handleCreateChannel}
               className="w-full flex items-center justify-between py-2 px-2 rounded-sm hover:bg-[#4752c4] text-[#b5bac1] hover:text-[#f0f0f9]"
             >
               <span className="">Create Channel</span>
@@ -59,7 +69,7 @@ const Dropdown = () => {
           </li>
           <li className="">
             <button
-              onClick={() => {}}
+              onClick={showAddCategoryPop}
               className="w-full flex items-center justify-between py-2 px-2 rounded-sm hover:bg-[#4752c4] text-[#b5bac1] hover:text-[#f0f0f9]"
             >
               <span className="">Create Category</span>
