@@ -3,6 +3,8 @@ import arrowRight from "../../../assets/arrow-right-4D545E.svg";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "../../../hooks";
 import { addServer, setCurrentServer } from "../../../store/serverSlice";
+import MyInput from "../../../components/MyInput";
+import { deployDappcordServer } from "../../../libs";
 export const SERVER_EXAMPLES = [
   "0x5FbDB2315678afecb367f032d93F642f64180aa3",
   "0x8464135c8F25Da09e49BC8782676a84730C318bC",
@@ -23,7 +25,11 @@ const AddServer = () => {
   const [serverSymbol, setServerSymbol] = useState("");
   const [serverAddress, setServerAddress] = useState("");
   const [inviteLinkError, setInviteLinkError] = useState("");
-  const createServer = () => {};
+  const createServer = async () => {
+    const address = await deployDappcordServer(serverName, serverSymbol);
+    dispatch(addServer(address));
+    closePopup();
+  };
 
   const handleJoin = async () => {
     try {
@@ -81,34 +87,24 @@ const AddServer = () => {
 
           <div className="flex flex-col items-center text-center pt-[24px] px-[18px] pb-[10px]">
             <h1 className="text-2xl font-bold mb-1">Customize Your Server</h1>
-            <p className="text-[#b2b7be] mb-5">
+            <p className="text-[#b2b7be] mb-2">
               Give your new server a personality with a name and a symbol. You
               can not change it after creating.
             </p>
-            <div className="w-full text-[#b2b7be] mb-3">
-              <h3 className="text-xs font-bold text-left w-full mb-2">
-                SERVER NAME
-              </h3>
-              <input
-                value={serverName}
-                onChange={(e) => setServerName(e.target.value)}
-                type="text"
-                className="w-full bg-[#1e1f22] rounded-sm py-2 px-3 focus:outline-none"
-                placeholder="Your server"
-              />
-            </div>
-            <div className="w-full text-[#b2b7be] mb-3">
-              <h3 className="text-xs font-bold text-left w-full mb-2">
-                SERVER SYMBOL
-              </h3>
-              <input
-                value={serverSymbol}
-                onChange={(e) => setServerSymbol(e.target.value)}
-                type="text"
-                className="w-full bg-[#1e1f22] rounded-sm py-2 px-3 focus:outline-none"
-                placeholder="Your symbol"
-              />
-            </div>
+            <MyInput
+              name="SERVER NAME"
+              placeholder="Your server"
+              type="text"
+              onChange={(e) => setServerName(e.target.value)}
+              value={serverName}
+            />
+            <MyInput
+              name="SERVER SYMBOL"
+              placeholder="Your symbol"
+              type="text"
+              onChange={(e) => setServerSymbol(e.target.value)}
+              value={serverSymbol}
+            />
           </div>
           <div className="flex items-center justify-between pt-[12px] px-[18px] pb-[18px] bg-[#2b2d31] text-sm font-semibold">
             <button

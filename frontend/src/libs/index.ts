@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import DappcordServerAbi from "../abis/DappcordServer.json";
-import { DappcordServer } from "../../types/ethers-contracts";
+import ContractConfig from "../../contract.config.json"
+import { DappcordServer, DappcordServer__factory } from "../../types/ethers-contracts";
 
 export type Channel = {
     channelId: string;
@@ -28,6 +29,19 @@ export type Server = {
 export const RPC_URL = 'http://127.0.0.1:8545/'
 
 export const CHAIN_ID = '31337'
+
+export async function deployDappcordServer(name: string, symbol: string) {
+    const ethereum = window.ethereum;
+    if (ethereum === undefined) {
+        throw new Error('Please install Metamask')
+    }
+
+    const signer = await getSigner();
+    const contractFactory = new ethers.ContractFactory(DappcordServerAbi, ContractConfig[31337].DappcordServer.bytecode, signer)
+    const contract = await contractFactory.deploy(name, symbol)
+    const address = await contract.getAddress()
+    return address;
+}
 
 export async function getServerContract(address: string) {
     const ethereum = window.ethereum;
