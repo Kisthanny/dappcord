@@ -31,7 +31,7 @@ const AddCategory = () => {
         <MyInput
           type="text"
           placeholder="new-category"
-          name="CHANNEL NAME"
+          name="CATEGORY NAME"
           className="bg-black"
           value={categoryName}
           onChange={(e) => setCategoryName(e.target.value)}

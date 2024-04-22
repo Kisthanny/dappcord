@@ -1,7 +1,7 @@
 import { showPopup, closePopup, CloseIcon } from "../../../components/Popup";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { BigNumberish } from "ethers";
+import { BigNumberish, ethers } from "ethers";
 import { getServerContract, getSigner } from "../../../libs";
 import { updateServer } from "../../../store/serverSlice";
 import MyInput from "../../../components/MyInput";
@@ -96,7 +96,7 @@ const AddChannel = ({
           channelName,
           channelTopic,
           channelType,
-          channelFee,
+          ethers.parseEther(channelFee.toString()),
           categoryId
         );
       await transaction.wait();

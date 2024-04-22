@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import DappcordServerAbi from "../abis/DappcordServer.json";
 import ContractConfig from "../../contract.config.json"
-import { DappcordServer, DappcordServer__factory } from "../../types/ethers-contracts";
+import { DappcordServer } from "../../types/ethers-contracts";
 
 export type Channel = {
     channelId: string;
@@ -20,6 +20,7 @@ export type Category = {
 }
 
 export type Server = {
+    owner: string,
     address: string,
     name: string,
     symbol: string,
@@ -70,6 +71,7 @@ export const getSigner = async () => {
 
 export const getServerInfo = async (contract: DappcordServer) => {
     const server: Server = {
+        owner: await contract.owner(),
         address: await contract.getAddress(),
         name: await contract.name(),
         symbol: await contract.symbol(),

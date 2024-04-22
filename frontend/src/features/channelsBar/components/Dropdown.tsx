@@ -9,6 +9,7 @@ import showAddChannelPop from "./AddChannelPopup";
 
 const Dropdown = () => {
   const currentServer = useAppSelector((state) => state.server.currentServer);
+  const isOwner = useAppSelector((state) => state.server.isOwner);
   const [isExpanded, setIsExpanded] = useState(false);
   const closePopupListener = () => {
     setTimeout(() => {
@@ -33,7 +34,7 @@ const Dropdown = () => {
   return (
     <div className="absolute z-10 left-0 top-0 right-0 h-[50px]">
       <button
-        disabled={currentServer === null}
+        disabled={currentServer === null || !isOwner}
         onClick={toggleExpand}
         className="w-full h-full border-b-[1px] border-[#1f2124] px-[18px] flex items-center justify-between hover:bg-[#35373c]"
       >

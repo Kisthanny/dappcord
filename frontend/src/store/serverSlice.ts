@@ -4,11 +4,13 @@ import { getServerContract, getServerInfo, Server } from "../libs";
 interface ServerState {
     serverList: Server[],
     currentServer: Server | null,
+    isOwner: boolean,
 }
 
 const initialState: ServerState = {
     serverList: [],
-    currentServer: null
+    currentServer: null,
+    isOwner: false,
 }
 
 export const addServer = createAsyncThunk(
@@ -44,7 +46,10 @@ export const serverSlice = createSlice({
             if (server) {
                 state.currentServer = server
             }
-        }
+        },
+        setIsOwner: (state, action: PayloadAction<boolean>) => {
+            state.isOwner = action.payload
+        },
     },
     extraReducers: builder => {
         builder.addCase(addServer.fulfilled, (state, action) => {
@@ -64,6 +69,6 @@ export const serverSlice = createSlice({
     }
 })
 
-export const { setCurrentServer } = serverSlice.actions
+export const { setCurrentServer, setIsOwner } = serverSlice.actions
 
 export default serverSlice.reducer

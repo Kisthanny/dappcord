@@ -59,14 +59,14 @@ const Channel = ({
   );
   const dispatch = useAppDispatch();
   const handleChannelClick = () => {
-    dispatch(setCurrentChannel(Number(channel.channelId)));
+    dispatch(setCurrentChannel(channel));
   };
   useEffect(() => {
     if (!currentChannel) {
-      dispatch(setCurrentChannel(Number(channel.channelId)));
+      dispatch(setCurrentChannel(channel));
       setIsCurrent(true);
     } else {
-      setIsCurrent(Number(currentChannel) === Number(channel.channelId));
+      setIsCurrent(currentChannel.channelId === channel.channelId);
     }
   }, [currentChannel]);
   return (
