@@ -23,7 +23,7 @@ export const channelSlice = createSlice({
     name: 'channel',
     initialState,
     reducers: {
-        setCurrentChannel: (state, action: PayloadAction<Channel>) => {
+        setCurrentChannel: (state, action: PayloadAction<Channel | null>) => {
             state.currentChannel = action.payload;
         },
     },

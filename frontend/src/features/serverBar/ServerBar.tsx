@@ -38,7 +38,7 @@ const ServerBar = () => {
         })
       );
     }
-  }, [currentChannel, currentWalletAddress]);
+  }, [currentServer, currentChannel, currentWalletAddress]);
   return (
     <section className="bg-[#1e1f22] h-full w-[73px]">
       <ul>
