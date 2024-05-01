@@ -45,6 +45,7 @@ export async function deployDappcordServer(name: string, symbol: string) {
 }
 
 export async function getServerContract(address: string) {
+    console.log({ RPC_URL })
     const ethereum = window.ethereum;
     if (ethereum === undefined) {
         throw new Error('Please install Metamask')
