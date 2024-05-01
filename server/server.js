@@ -6,7 +6,8 @@ const server = app.listen(PORT, () => console.log(`Listening on ${PORT}\n`));
 
 const messages = [
   {
-    channel: "0x5FbDB2315678afecb367f032d93F642f64180aa3-0x5FbDB2315678afecb367f032d93F642f64180aa3-10001",
+    channel:
+      "0x5FbDB2315678afecb367f032d93F642f64180aa3-0x5FbDB2315678afecb367f032d93F642f64180aa3-10001",
     account: "0xcA8Fa8f0b631EcdB18Cda619C4Fc9d197c8aFfCa",
     text: "Welcome to Dappcord!",
   },
@@ -55,7 +56,8 @@ const messages = [
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://dappcord-zeta.vercel.app",
+    methods: ["GET", "POST"],
   },
 });
 
