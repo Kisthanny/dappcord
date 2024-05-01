@@ -121,7 +121,6 @@ const AddChannel = ({
             className="w-full bg-transparent text-[#dbdee1] outline-none"
             defaultValue={categoryId}
             onChange={(e) => {
-              console.log(e.target.value);
               setCategoryId(e.target.value);
             }}
           >

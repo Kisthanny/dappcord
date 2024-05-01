@@ -4,6 +4,7 @@
   "description": "dappazon backend",
   "main": "index.js",
   "scripts": {
+    "build": "node ./server.js",
     "test": "npx hardhat test",
     "deploy": "npx hardhat run scripts/deploy.ts --network localhost"
   },
