@@ -4,7 +4,7 @@ import { Message } from "../../libs/chat";
 import { io } from "socket.io-client";
 import { useAppSelector } from "../../hooks";
 
-const socket = io("ws://localhost:3030");
+const socket = io("https://dappcord-server.vercel.app/");
 const ChatMessages = ({
   messages,
   channel,

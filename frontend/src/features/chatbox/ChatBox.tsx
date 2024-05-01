@@ -5,7 +5,7 @@ import { Message } from "../../libs/chat";
 import ChatMessages from "./ChatMessages";
 import JoinChannelButton from "./JoinChannelButton";
 
-const socket = io("ws://localhost:3030");
+const socket = io("https://dappcord-server.vercel.app/");
 
 const ChatBox = () => {
   const [messages, setMessages] = useState([] as Message[]);
