@@ -11,9 +11,11 @@ import { setUserHasJoined } from "../../store/channelSlice";
 const JoinChannelButton = ({
   server,
   channel,
+  onJoin,
 }: {
   server: Server | null;
   channel: Channel | null;
+  onJoin: (server: string, channel: string, account: string) => void;
 }) => {
   const dispatch = useAppDispatch();
   const joinChannel = async () => {
@@ -33,6 +35,7 @@ const JoinChannelButton = ({
           userAddress: signer.address,
         })
       );
+      onJoin(server.address, channel.channelId, signer.address);
     }
   };
   return (

@@ -1,16 +1,15 @@
 import { useState, FormEvent } from "react";
 import { Channel } from "../../libs";
 import { Message } from "../../libs/chat";
-import { io } from "socket.io-client";
 import { useAppSelector } from "../../hooks";
-
-const socket = io("https://dappcord-server.vercel.app/");
 const ChatMessages = ({
   messages,
   channel,
+  onSendMessage,
 }: {
   messages: Message[];
   channel: Channel;
+  onSendMessage: (messageObj: Message) => void;
 }) => {
   const currentServer = useAppSelector((state) => state.server.currentServer);
   const account = useAppSelector((state) => state.account.currentWalletAddress);
@@ -19,13 +18,14 @@ const ChatMessages = ({
     e.preventDefault();
 
     const messageObj: Message = {
-      channel: `${currentServer?.address}-${channel.channelId}`,
-      account: account,
+      serverAddress: `${currentServer?.address}`,
+      channelId: `${channel.channelId}`,
+      accountAddress: account,
       text: userInput,
     };
 
     if (userInput) {
-      socket.emit("new message", messageObj);
+      onSendMessage(messageObj);
     }
 
     setUserInput("");
@@ -37,7 +37,7 @@ const ChatMessages = ({
         {messages.map((message, index) => (
           <div key={index} className="flex flex-col items-start py-2">
             <span className="text-[#3493d0] font-semibold">
-              {message.account}
+              {message.accountAddress}
             </span>
             <span className="text-[#d4d2d8] text-[15px]">{message.text}</span>
           </div>
