@@ -35,6 +35,7 @@ const ChatBox = () => {
       const channel = getChannelById(channelId, currentServer);
       dispatch(setCurrentChannel(channel));
       joinChannel();
+      startListening();
     }
   };
 
@@ -46,6 +47,11 @@ const ChatBox = () => {
       server: currentServer.address,
       channel: currentChannel.channelId,
       account: currentWalletAddress,
+    });
+
+    socket.emit("getMessages", {
+      server: currentServer.address,
+      channel: currentChannel.channelId,
     });
   };
   const leaveChannel = async () => {
@@ -59,28 +65,31 @@ const ChatBox = () => {
     });
   };
 
+  const startListening = () => {
+    socket.on(
+      "newMessage",
+      ({
+        account,
+        text,
+        history,
+      }: {
+        account: string;
+        text: string;
+        history: Message[];
+      }) => {
+        setMessages(history);
+      }
+    );
+
+    socket.on("messageHistory", (messages: Message[]) => {
+      setMessages(messages);
+    });
+  };
+
   const onRoomChanged = async () => {
     if (currentServer && currentChannel) {
       joinChannel();
-      socket.on("connect", () => {
-        socket.emit("get messages");
-      });
-
-      socket.on(
-        "newMessage",
-        ({ account, text }: { account: string; text: string }) => {
-          console.log(`new message from ${account}: ${text}`);
-        }
-      );
-
-      socket.on("messagesFromChannel", (messages: Message[]) => {
-        console.log("client new message", messages);
-        setMessages(messages);
-      });
-
-      socket.on("get messages", (messages: Message[]) => {
-        setMessages(messages);
-      });
+      startListening();
     }
   };
 

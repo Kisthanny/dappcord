@@ -46,14 +46,28 @@ io.on("connection", (socket) => {
     console.log(`${account} leave the room ${roomId}`);
   });
 
-  socket.on(
-    "sendMessage",
-    ({ server, channel, text, account }) => {
-      const roomId = getRoomId(server, channel);
-      socket.to(roomId).emit("newMessage", { account, text });
-      console.log(`${account}: ${text}`);
-    }
-  );
+  socket.on("sendMessage", ({ server, channel, text, account }) => {
+    const roomId = getRoomId(server, channel);
+    messageRecord.addMessage({
+      server,
+      channel,
+      account,
+      text,
+    });
+    io.to(roomId).emit("newMessage", {
+      account,
+      text,
+      history: messageRecord.history[roomId],
+    });
+    console.log(`${account}: ${text}`);
+  });
+
+  socket.on("getMessages", ({ server, channel }) => {
+    socket.emit(
+      "messageHistory",
+      messageRecord.getMessagesFromRoom({ server, channel })
+    );
+  });
 
   socket.on("disconnect", () => {
     console.log("User had left!!!");

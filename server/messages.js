@@ -1,3 +1,5 @@
+const {generateRandomString} = require("./utils")
+
 const getRoomId = (server, channel) => {
   return `${server.toLocaleLowerCase()}-${channel.toLocaleLowerCase()}`;
 };
@@ -16,7 +18,8 @@ class MessageRecord {
   constructor() {
     this.history = {};
   }
-  addMessage({ id, server, channel, account, text }) {
+  addMessage({  server, channel, account, text }) {
+    const id = generateRandomString(16);
     const message = new Message({
       id,
       server,
