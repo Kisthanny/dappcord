@@ -28,6 +28,9 @@ export const channelSlice = createSlice({
         },
     },
     extraReducers: builder => {
+        builder.addCase(setUserHasJoined.pending, (state) => {
+            state.userHasJoined = false;
+        })
         builder.addCase(setUserHasJoined.fulfilled, (state, action) => {
             state.userHasJoined = action.payload
         })

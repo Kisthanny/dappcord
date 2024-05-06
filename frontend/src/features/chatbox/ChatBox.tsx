@@ -1,10 +1,15 @@
-import { useAppSelector } from "../../hooks";
+import { useAppDispatch, useAppSelector } from "../../hooks";
 import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 import { Message } from "../../libs/chat";
 import ChatMessages from "./ChatMessages";
 import JoinChannelButton from "./JoinChannelButton";
-import { getSigner } from "../../libs";
+import {
+  getIsOwnerSync,
+  getUserHasJoinedSync,
+  getChannelById,
+} from "../../libs";
+import { setCurrentChannel } from "../../store/channelSlice";
 
 const socket = io(import.meta.env.VITE_ENDPOINT);
 
@@ -16,41 +21,85 @@ const ChatBox = () => {
   const currentChannel = useAppSelector(
     (state) => state.channel.currentChannel
   );
+  const currentWalletAddress = useAppSelector(
+    (state) => state.account.currentWalletAddress
+  );
+  const dispatch = useAppDispatch();
 
   const onSendMessage = (messageObj: Message) => {
-    socket.emit("new message", messageObj);
+    socket.emit("sendMessage", messageObj);
+  };
+
+  const handleOnJoin = (channelId: string) => {
+    if (currentServer) {
+      const channel = getChannelById(channelId, currentServer);
+      dispatch(setCurrentChannel(channel));
+      joinChannel();
+    }
   };
 
   const joinChannel = async () => {
-    const signer = await getSigner();
+    if (!currentServer || !currentChannel) {
+      return;
+    }
     socket.emit("join", {
-      server: currentServer?.address,
-      channel: currentChannel?.channelId,
-      account: signer.address,
+      server: currentServer.address,
+      channel: currentChannel.channelId,
+      account: currentWalletAddress,
+    });
+  };
+  const leaveChannel = async () => {
+    if (!currentServer || !currentChannel) {
+      return;
+    }
+    socket.emit("leave", {
+      server: currentServer.address,
+      channel: currentChannel.channelId,
+      account: currentWalletAddress,
     });
   };
 
+  const onRoomChanged = async () => {
+    if (currentServer && currentChannel) {
+      joinChannel();
+      socket.on("connect", () => {
+        socket.emit("get messages");
+      });
+
+      socket.on(
+        "newMessage",
+        ({ account, text }: { account: string; text: string }) => {
+          console.log(`new message from ${account}: ${text}`);
+        }
+      );
+
+      socket.on("messagesFromChannel", (messages: Message[]) => {
+        console.log("client new message", messages);
+        setMessages(messages);
+      });
+
+      socket.on("get messages", (messages: Message[]) => {
+        setMessages(messages);
+      });
+    }
+  };
+
   useEffect(() => {
-    joinChannel();
-    socket.on("connect", () => {
-      socket.emit("get messages");
-    });
-
-    socket.on("messagesFromChannel", (messages: Message[]) => {
-      console.log("client new message", messages);
-      setMessages(messages);
-    });
-
-    socket.on("get messages", (messages: Message[]) => {
-      setMessages(messages);
-    });
-
-    return () => {
-      socket.off("connect");
-      socket.off("new message");
-      socket.off("get messages");
-    };
-  }, [currentServer, currentChannel]);
+    if (currentServer && currentChannel) {
+      const isOwnerSync = getIsOwnerSync(currentServer, currentWalletAddress);
+      const hasJoinedSync = getUserHasJoinedSync(
+        currentChannel,
+        currentWalletAddress
+      );
+      if (isOwnerSync || hasJoinedSync) {
+        onRoomChanged();
+        return () => {
+          leaveChannel();
+          socket.off();
+        };
+      }
+    }
+  }, [currentChannel, currentWalletAddress]);
 
   return (
     <section className="flex-grow">
@@ -58,9 +107,9 @@ const ChatBox = () => {
         <ChatMessages
           messages={messages.filter(
             (message) =>
-              message.serverAddress.toLocaleLowerCase() ===
+              message.server.toLocaleLowerCase() ===
                 currentServer?.address?.toLocaleLowerCase() &&
-              message.channelId === currentChannel?.channelId
+              message.channel === currentChannel?.channelId
           )}
           channel={currentChannel}
           onSendMessage={onSendMessage}
@@ -70,7 +119,7 @@ const ChatBox = () => {
         <JoinChannelButton
           server={currentServer}
           channel={currentChannel}
-          onJoin={joinChannel}
+          onJoin={handleOnJoin}
         />
       )}
       {currentChannel === null && (

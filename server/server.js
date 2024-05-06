@@ -1,6 +1,5 @@
 const express = require("express");
 const { Server } = require("socket.io");
-const { generateRandomString } = require("./utils");
 
 const PORT = process.env.PORT || 5000;
 
@@ -20,47 +19,41 @@ const io = new Server(server, {
   },
 });
 
-const messages = require("./messages");
+const messageRecord = require("./messages");
+
+const getRoomId = (server, channel) => {
+  return `${server.toLocaleLowerCase()}-${channel.toLocaleLowerCase()}`;
+};
 
 io.on("connection", (socket) => {
   console.log("We have a new connection!!!");
 
   socket.on("join", ({ server, channel, account }) => {
-    socket.join(server);
-    socket.join(channel);
+    if (!server || !channel || !account) {
+      return;
+    }
+    const roomId = getRoomId(server, channel);
+    socket.join(roomId);
+    console.log(`${account} join the room ${roomId}`);
+  });
+
+  socket.on("leave", ({ server, channel, account }) => {
+    if (!server || !channel || !account) {
+      return;
+    }
+    const roomId = getRoomId(server, channel);
+    socket.leave(roomId);
+    console.log(`${account} leave the room ${roomId}`);
   });
 
   socket.on(
-    "new message",
-    ({ serverAddress, channelId, accountAddress, text }) => {
-      const id = generateRandomString(10);
-      console.log("server new message", {
-        id: id,
-        channelId,
-        serverAddress,
-        accountAddress,
-        text,
-      });
-      messages.addMessage({
-        id: id,
-        channelId,
-        serverAddress,
-        accountAddress,
-        text,
-      });
-
-      const messagesFromChannel = messages.getMessagesFromChannel({
-        serverAddress,
-        channelId,
-      });
-
-      io.to(serverAddress)
-        .to(channelId)
-        .emit("messagesFromChannel", messagesFromChannel);
+    "sendMessage",
+    ({ server, channel, text, account }) => {
+      const roomId = getRoomId(server, channel);
+      socket.to(roomId).emit("newMessage", { account, text });
+      console.log(`${account}: ${text}`);
     }
   );
-
-  socket.on("get message", () => {});
 
   socket.on("disconnect", () => {
     console.log("User had left!!!");

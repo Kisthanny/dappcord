@@ -1,6 +1,6 @@
 export type Message = {
-    serverAddress: string;
-    channelId: string;
-    accountAddress: string;
+    server: string;
+    channel: string;
+    account: string;
     text: string;
 }

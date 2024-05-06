@@ -6,7 +6,7 @@ import {
   getSigner,
 } from "../../libs/index";
 import { useAppDispatch } from "../../hooks";
-import { setUserHasJoined } from "../../store/channelSlice";
+import { updateServer } from "../../store/serverSlice";
 
 const JoinChannelButton = ({
   server,
@@ -15,7 +15,7 @@ const JoinChannelButton = ({
 }: {
   server: Server | null;
   channel: Channel | null;
-  onJoin: (server: string, channel: string, account: string) => void;
+  onJoin: (channelId:string) => void;
 }) => {
   const dispatch = useAppDispatch();
   const joinChannel = async () => {
@@ -28,14 +28,8 @@ const JoinChannelButton = ({
           value: channel.channelFee,
         });
       await transaction.wait();
-      dispatch(
-        setUserHasJoined({
-          serverAddress: server.address,
-          channelId: channel.channelId,
-          userAddress: signer.address,
-        })
-      );
-      onJoin(server.address, channel.channelId, signer.address);
+      await dispatch(updateServer(server.address));
+      onJoin(channel.channelId);
     }
   };
   return (

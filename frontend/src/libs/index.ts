@@ -109,3 +109,26 @@ export const getChannelList = async (contract: DappcordServer, categoryId: strin
     })
     return await Promise.all(promiseList)
 }
+
+export const getUserHasJoinedSync = (channel: Channel, userAddress: string) => {
+    return channel.memberList.some(address => address.toLocaleLowerCase() === userAddress.toLocaleLowerCase())
+}
+
+export const getIsOwnerSync = (server: Server, userAddress: string) => {
+    return server.owner.toLocaleLowerCase() === userAddress.toLocaleLowerCase()
+}
+
+export const getChannelById = (channelId: string, server: Server) => {
+    const categoryList = server.categoryList;
+    for (let i = 0; i < categoryList.length; i++) {
+        const cate = categoryList[i];
+        const channelList = cate.channelList;
+        for (let j = 0; j < channelList.length; j++) {
+            const channel = channelList[j];
+            if (channel.channelId.toLocaleLowerCase() === channelId.toLocaleLowerCase()) {
+                return channel
+            }
+        }
+    }
+    throw new Error('not found channel by channelId')
+}

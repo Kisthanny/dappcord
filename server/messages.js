@@ -1,37 +1,41 @@
+const getRoomId = (server, channel) => {
+  return `${server.toLocaleLowerCase()}-${channel.toLocaleLowerCase()}`;
+};
+
 class Message {
-  constructor({ id, serverAddress, channelId, accountAddress, text }) {
+  constructor({ id, server, channel, account, text }) {
     this.id = id;
-    this.serverAddress = serverAddress;
-    this.channelId = channelId;
-    this.accountAddress = accountAddress;
+    this.server = server;
+    this.channel = channel;
+    this.account = account;
     this.text = text;
   }
 }
 
-class Messages {
+class MessageRecord {
   constructor() {
     this.history = {};
   }
-  addMessage({ id, serverAddress, channelId, accountAddress, text }) {
+  addMessage({ id, server, channel, account, text }) {
     const message = new Message({
       id,
-      serverAddress,
-      channelId,
-      accountAddress,
+      server,
+      channel,
+      account,
       text,
     });
-    const historyId = `${serverAddress}-${channelId}`;
-    if (!this.history[historyId]) {
-      this.history[historyId] = [];
+    const roomId = getRoomId(server, channel);
+    if (!this.history[roomId]) {
+      this.history[roomId] = [];
     }
-    this.history[historyId].push(message);
+    this.history[roomId].push(message);
   }
-  getMessagesFromChannel({ serverAddress, channelId }) {
-    const historyId = `${serverAddress}-${channelId}`;
-    return this.history[historyId] || [];
+  getMessagesFromRoom({ server, channel }) {
+    const roomId = getRoomId(server, channel);
+    return this.history[roomId] || [];
   }
 }
 
-const messages = new Messages();
+const messageRecord = new MessageRecord();
 
-module.exports = messages;
+module.exports = messageRecord;

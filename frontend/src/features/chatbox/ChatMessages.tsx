@@ -18,9 +18,9 @@ const ChatMessages = ({
     e.preventDefault();
 
     const messageObj: Message = {
-      serverAddress: `${currentServer?.address}`,
-      channelId: `${channel.channelId}`,
-      accountAddress: account,
+      server: `${currentServer?.address}`,
+      channel: `${channel.channelId}`,
+      account: account,
       text: userInput,
     };
 
@@ -37,7 +37,7 @@ const ChatMessages = ({
         {messages.map((message, index) => (
           <div key={index} className="flex flex-col items-start py-2">
             <span className="text-[#3493d0] font-semibold">
-              {message.accountAddress}
+              {message.account}
             </span>
             <span className="text-[#d4d2d8] text-[15px]">{message.text}</span>
           </div>
