@@ -5,12 +5,7 @@ import { useAppDispatch } from "../../../hooks";
 import { addServer, setCurrentServer } from "../../../store/serverSlice";
 import MyInput from "../../../components/MyInput";
 import { deployDappcordServer } from "../../../libs";
-export const SERVER_EXAMPLES = [
-  "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-  "0x8464135c8F25Da09e49BC8782676a84730C318bC",
-  "0x663F3ad617193148711d28f5334eE4Ed07016602",
-  "0x057ef64E23666F000b34aE31332854aCBd1c8544",
-];
+import { getRecommendServers, RecommendServer } from "../../../api";
 export enum Step {
   "CREATE_YOUR_SERVER" = "Create-Your-Server",
   "CUSTOMIZE_YOUR_SERVER" = "Customize-Your-Server",
@@ -25,6 +20,10 @@ const AddServer = () => {
   const [serverSymbol, setServerSymbol] = useState("");
   const [serverAddress, setServerAddress] = useState("");
   const [inviteLinkError, setInviteLinkError] = useState("");
+  const [recommendServers, setRecommendServers] = useState(
+    [] as RecommendServer[]
+  );
+
   const createServer = async () => {
     const address = await deployDappcordServer(serverName, serverSymbol);
     dispatch(addServer(address));
@@ -41,9 +40,20 @@ const AddServer = () => {
       setInviteLinkError((error as Error).message);
     }
   };
+
+  const onMounted = async () => {
+    const servers = await getRecommendServers();
+    setRecommendServers(servers);
+  };
+
+  useEffect(() => {
+    onMounted();
+  }, []);
+
   useEffect(() => {
     setInviteLinkError("");
   }, [serverAddress]);
+
   return (
     <>
       {step === Step.CREATE_YOUR_SERVER && (
@@ -156,7 +166,7 @@ const AddServer = () => {
               INVITES SHOULD LOOK LIKE
             </h3>
             <ul className="w-full flex flex-col items-start text-xs text-[#dbdcdf] gap-1 cursor-default">
-              {SERVER_EXAMPLES.map((address) => (
+              {recommendServers.map(({ address }) => (
                 <li
                   key={address}
                   onClick={() => {

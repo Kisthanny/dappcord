@@ -1,0 +1,23 @@
+{
+  "name": "dappcord",
+  "version": "1.0.0",
+  "description": "This project demonstrates a blockchain chatroom application mimicking Discord.\r User could create their own servers and channels.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Kisthanny/dappcord.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kisthanny/dappcord/issues"
+  },
+  "homepage": "https://github.com/Kisthanny/dappcord#readme",
+  "dependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

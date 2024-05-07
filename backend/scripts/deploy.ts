@@ -8,7 +8,7 @@ async function main() {
     const DappcordServer = await hre.ethers.getContractFactory("DappcordServer");
     const sheldonServer = await DappcordServer.connect(sheldon).deploy("Sheldonopoly", "S");
     const leonerdServer = await DappcordServer.connect(leonerd).deploy("Hofstaton", "H");
-    const rajServer = await DappcordServer.connect(raj).deploy("Rajmahah", "R");
+    const rajServer = await DappcordServer.connect(raj).deploy("Rajmahal", "R");
     const howardServer = await DappcordServer.connect(howard).deploy("Wolowizburg", "W");
 
     console.log('sheldon', await sheldonServer.getAddress())
