@@ -1,15 +1,31 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const { Server } = require("socket.io");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+
+const serverRouter = require("./router/serverRouter");
+const userRouter = require("./router/userRouter");
+
 dotenv.config();
+
+const connectDB = require("./config/db");
+connectDB();
 
 const PORT = process.env.PORT || 5000;
 
-const router = require("./router");
-
 const app = express();
 
-app.use(router);
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("server is up and running");
+});
+
+app.use("/api/server", serverRouter);
+app.use("/api/user", userRouter);
+
+app.use(notFound);
+app.use(errorHandler);
 
 const server = app.listen(PORT, () =>
   console.log(`Server has started on port ${PORT}`)
