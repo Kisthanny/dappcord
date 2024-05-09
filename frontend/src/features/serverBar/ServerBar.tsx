@@ -6,6 +6,7 @@ import { setIsOwner, setServerList } from "../../store/serverSlice";
 import { setUserHasJoined } from "../../store/channelSlice";
 import { getServerCollectionByUser } from "../../api";
 import { getServers } from "../../libs";
+import { signIn } from "../../libs/user";
 
 const ServerBar = () => {
   const dispatch = useAppDispatch();
@@ -23,6 +24,7 @@ const ServerBar = () => {
     if (!currentWalletAddress) {
       return;
     }
+    await signIn(currentWalletAddress);
     const collection = await getServerCollectionByUser(currentWalletAddress);
     const servers = await getServers(collection);
     dispatch(setServerList(servers));

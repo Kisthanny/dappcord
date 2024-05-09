@@ -19,6 +19,12 @@ type AddServerCollectionByUserBody = {
     server: string;
 }
 
+type LoginResponse = {
+    _id: string;
+    address: string;
+    token: string;
+}
+
 const SUCCESS = {
     message: 'success'
 }
@@ -53,4 +59,16 @@ export const addServerCollectionByUser = async (body: AddServerCollectionByUserB
         throw new Error(response.statusText)
     }
     return SUCCESS
+}
+
+export const login = async (address: string, signature: string) => {
+    const response = await axios.post('/api/user/login', {
+        address,
+        signature
+    })
+    console.log(response)
+    if (response.status !== 201) {
+        throw new Error(response.statusText)
+    }
+    return response.data as LoginResponse
 }

@@ -1,32 +1,36 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const Server = require("../models/serverModel");
+const generateToken = require("../config/generateToken");
 
-const addUser = asyncHandler(async (req, res) => {
-  const { address } = req.body;
+const authUser = asyncHandler(async (req, res) => {
+  const { address, signature } = req.body;
 
-  if (!address) {
+  if (!address || !signature) {
     res.status(400);
     throw new Error("missing argument");
   }
 
-  const userExist = await User.findOne({ address });
-  if (userExist) {
+  if (!req.signatureVerified) {
     res.status(400);
-    throw new Error("User already exists");
+    throw new Error("Invalid Signature");
   }
 
-  const user = await User.create({
-    address,
-  });
+  let user = await User.findOne({ address });
   if (!user) {
-    res.status(400);
-    throw new Error("Failed to Add the User");
+    user = await User.create({
+      address,
+    });
+    if (!user) {
+      res.status(400);
+      throw new Error("Failed to Add the User");
+    }
   }
 
   res.status(201).json({
     _id: user._id,
     address: user.address,
+    token: generateToken(user._id),
   });
 });
 
@@ -89,4 +93,8 @@ const getServerCollection = asyncHandler(async (req, res) => {
   res.status(200).json(serverAddressList);
 });
 
-module.exports = { addUser, addServerCollection, getServerCollection };
+module.exports = {
+  authUser,
+  addServerCollection,
+  getServerCollection,
+};

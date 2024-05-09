@@ -1,6 +1,8 @@
 import { useAppSelector } from "../hooks";
 const Connect = () => {
-  const currentWalletAddress = useAppSelector((state) => state.account.currentWalletAddress);
+  const currentWalletAddress = useAppSelector(
+    (state) => state.account.currentWalletAddress
+  );
   const handleConnect = async () => {
     try {
       const ethereum = window.ethereum;

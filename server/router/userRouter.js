@@ -1,13 +1,21 @@
 const express = require("express");
 const {
-  addUser,
   addServerCollection,
   getServerCollection,
+  authUser,
 } = require("../controllers/userControllers");
 const { toLowerCaseMiddleware } = require("../middleware/index");
+const {
+  signatureVerificationMiddleware,
+} = require("../middleware/verifyMiddleware");
 const router = express.Router();
 
-router.post("/add", toLowerCaseMiddleware(["address"]), addUser);
+router.post(
+  "/login",
+  toLowerCaseMiddleware(["address"]),
+  signatureVerificationMiddleware,
+  authUser
+);
 
 router.post(
   "/addServerCollection",
@@ -15,6 +23,10 @@ router.post(
   addServerCollection
 );
 
-router.get("/serverCollection/:address", toLowerCaseMiddleware(["address"]), getServerCollection);
+router.get(
+  "/serverCollection/:address",
+  toLowerCaseMiddleware(["address"]),
+  getServerCollection
+);
 
 module.exports = router;

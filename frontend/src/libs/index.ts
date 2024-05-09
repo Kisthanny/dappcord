@@ -29,7 +29,7 @@ export type Server = {
 
 export const RPC_URL = import.meta.env.VITE_RPC_URL;
 
-export const CHAIN_ID = import.meta.env.CHAIN_ID;
+export const CHAIN_ID = import.meta.env.VITE_CHAIN_ID;
 
 export async function deployDappcordServer(name: string, symbol: string) {
     const ethereum = window.ethereum;
