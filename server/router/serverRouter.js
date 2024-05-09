@@ -5,12 +5,18 @@ const {
   getServerByAddress,
 } = require("../controllers/serverControllers");
 const { toLowerCaseMiddleware } = require("../middleware/index");
+const { protect } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 router.get("/", getServers);
 
 router.get("/:address", toLowerCaseMiddleware(["address"]), getServerByAddress);
 
-router.post("/add", toLowerCaseMiddleware(["address", "owner"]), addServer);
+router.post(
+  "/add",
+  toLowerCaseMiddleware(["address", "owner"]),
+  protect,
+  addServer
+);
 
 module.exports = router;
