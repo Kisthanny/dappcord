@@ -2,8 +2,10 @@ import AddIcon from "./components/AddIcon";
 import ServerIcon from "./components/ServerIcon";
 import { useAppSelector, useAppDispatch } from "../../hooks";
 import { useEffect } from "react";
-import { setIsOwner } from "../../store/serverSlice";
+import { setIsOwner, setServerList } from "../../store/serverSlice";
 import { setUserHasJoined } from "../../store/channelSlice";
+import { getServerCollectionByUser } from "../../api";
+import { getServers } from "../../libs";
 
 const ServerBar = () => {
   const dispatch = useAppDispatch();
@@ -16,6 +18,19 @@ const ServerBar = () => {
   const currentChannel = useAppSelector(
     (state) => state.channel.currentChannel
   );
+
+  const initServerListByUser = async () => {
+    if (!currentWalletAddress) {
+      return;
+    }
+    const collection = await getServerCollectionByUser(currentWalletAddress);
+    const servers = await getServers(collection);
+    dispatch(setServerList(servers));
+  };
+
+  useEffect(() => {
+    initServerListByUser();
+  }, [currentWalletAddress]);
 
   useEffect(() => {
     if (currentServer) {

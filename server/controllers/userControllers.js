@@ -38,10 +38,13 @@ const addServerCollection = asyncHandler(async (req, res) => {
     throw new Error("missing argument");
   }
 
-  const userObj = await User.findOne({ address: user });
+  let userObj = await User.findOne({ address: user });
   if (!userObj) {
-    res.status(400);
-    throw new Error("User not found");
+    userObj = await User.create({ address: user });
+    if (!userObj) {
+      res.status(400);
+      throw new Error("Add User Failed");
+    }
   }
 
   const serverObj = await Server.findOne({ address: server });
@@ -70,8 +73,7 @@ const getServerCollection = asyncHandler(async (req, res) => {
   const { address } = req.params;
   const user = await User.findOne({ address });
   if (!user) {
-    res.status(400);
-    throw new Error("User not Found");
+    res.status(200).json([]);
   }
 
   const promiseList = user.servers.map(async (serverId) => {

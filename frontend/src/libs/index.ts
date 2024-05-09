@@ -61,6 +61,15 @@ export async function getServerContract(address: string) {
     const serverContract = new ethers.Contract(address, DappcordServerAbi, provider)
     return serverContract as unknown as DappcordServer;
 }
+
+export async function getServers(addressList: string[]) {
+    const promiseList = addressList.map(async address => {
+        const contract = await getServerContract(address);
+        return await getServerInfo(contract);
+    })
+    return await Promise.all(promiseList)
+}
+
 export const getSigner = async () => {
     if (window.ethereum === undefined) {
         throw new Error('Please install Metamask')

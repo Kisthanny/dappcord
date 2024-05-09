@@ -50,6 +50,11 @@ export const serverSlice = createSlice({
         setIsOwner: (state, action: PayloadAction<boolean>) => {
             state.isOwner = action.payload
         },
+        setServerList: (state, action: PayloadAction<Server[]>) => {
+            const serverList = action.payload;
+            state.serverList = serverList;
+            state.currentServer = serverList.length ? serverList[0] : null;
+        }
     },
     extraReducers: builder => {
         builder.addCase(addServer.fulfilled, (state, action) => {
@@ -69,6 +74,6 @@ export const serverSlice = createSlice({
     }
 })
 
-export const { setCurrentServer, setIsOwner } = serverSlice.actions
+export const { setCurrentServer, setIsOwner, setServerList } = serverSlice.actions
 
 export default serverSlice.reducer
