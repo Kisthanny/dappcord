@@ -101,7 +101,7 @@ const fetchChat = asyncHandler(async (req, res) => {
   }
 
   res.status(200).json({
-    roomId: chat._id,
+    chatRoomId: chat._id,
   });
 });
 

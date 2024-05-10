@@ -18,10 +18,11 @@ const addServer = asyncHandler(async (req, res) => {
   }
 
   const [owner, symbol, name] = await Promise.all([
-    getOwner.bind(null, address),
-    getSymbol.bind(null, address),
-    getName.bind(null, address),
+    getOwner(address),
+    getSymbol(address),
+    getName(address),
   ]);
+  console.log(owner);
 
   const server = await Server.create({
     owner,

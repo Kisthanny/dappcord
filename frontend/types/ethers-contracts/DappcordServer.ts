@@ -39,6 +39,7 @@ export interface DappcordServerInterface extends Interface {
       | "getCategoryIdList"
       | "getChannelIdList"
       | "getMemberList"
+      | "getlatestChannelId"
       | "hasJoined"
       | "isApprovedForAll"
       | "joinChannel"
@@ -56,7 +57,11 @@ export interface DappcordServerInterface extends Interface {
   ): FunctionFragment;
 
   getEvent(
-    nameOrSignatureOrTopic: "Approval" | "ApprovalForAll" | "Transfer"
+    nameOrSignatureOrTopic:
+      | "Approval"
+      | "ApprovalForAll"
+      | "ChannelCreated"
+      | "Transfer"
   ): EventFragment;
 
   encodeFunctionData(
@@ -110,6 +115,10 @@ export interface DappcordServerInterface extends Interface {
   encodeFunctionData(
     functionFragment: "getMemberList",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getlatestChannelId",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "hasJoined",
@@ -202,6 +211,10 @@ export interface DappcordServerInterface extends Interface {
     functionFragment: "getMemberList",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getlatestChannelId",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "hasJoined", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
@@ -272,6 +285,18 @@ export namespace ApprovalForAllEvent {
     owner: string;
     operator: string;
     approved: boolean;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ChannelCreatedEvent {
+  export type InputTuple = [channelId: BigNumberish];
+  export type OutputTuple = [channelId: bigint];
+  export interface OutputObject {
+    channelId: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -420,6 +445,8 @@ export interface DappcordServer extends BaseContract {
     [string[]],
     "view"
   >;
+
+  getlatestChannelId: TypedContractMethod<[], [bigint], "view">;
 
   hasJoined: TypedContractMethod<
     [_channelId: BigNumberish, _member: AddressLike],
@@ -573,6 +600,9 @@ export interface DappcordServer extends BaseContract {
     nameOrSignature: "getMemberList"
   ): TypedContractMethod<[_channelId: BigNumberish], [string[]], "view">;
   getFunction(
+    nameOrSignature: "getlatestChannelId"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "hasJoined"
   ): TypedContractMethod<
     [_channelId: BigNumberish, _member: AddressLike],
@@ -659,6 +689,13 @@ export interface DappcordServer extends BaseContract {
     ApprovalForAllEvent.OutputObject
   >;
   getEvent(
+    key: "ChannelCreated"
+  ): TypedContractEvent<
+    ChannelCreatedEvent.InputTuple,
+    ChannelCreatedEvent.OutputTuple,
+    ChannelCreatedEvent.OutputObject
+  >;
+  getEvent(
     key: "Transfer"
   ): TypedContractEvent<
     TransferEvent.InputTuple,
@@ -687,6 +724,17 @@ export interface DappcordServer extends BaseContract {
       ApprovalForAllEvent.InputTuple,
       ApprovalForAllEvent.OutputTuple,
       ApprovalForAllEvent.OutputObject
+    >;
+
+    "ChannelCreated(uint256)": TypedContractEvent<
+      ChannelCreatedEvent.InputTuple,
+      ChannelCreatedEvent.OutputTuple,
+      ChannelCreatedEvent.OutputObject
+    >;
+    ChannelCreated: TypedContractEvent<
+      ChannelCreatedEvent.InputTuple,
+      ChannelCreatedEvent.OutputTuple,
+      ChannelCreatedEvent.OutputObject
     >;
 
     "Transfer(address,address,uint256)": TypedContractEvent<

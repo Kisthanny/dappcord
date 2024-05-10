@@ -5,6 +5,7 @@ import { BigNumberish, ethers } from "ethers";
 import { getServerContract, getSigner } from "../../../libs";
 import { updateServer } from "../../../store/serverSlice";
 import MyInput from "../../../components/MyInput";
+import { addChannel } from "../../../api";
 const voiceIcon = (size: number) => (
   <svg
     className="icon flex-shrink-0"
@@ -100,6 +101,8 @@ const AddChannel = ({
           categoryId
         );
       await transaction.wait();
+      const channelId = (await contract.getlatestChannelId()).toString();
+      addChannel({ server: currentServer.address, channel: channelId });
       await dispatch(updateServer(currentServer.address));
       closePopup();
     }

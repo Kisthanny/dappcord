@@ -40,8 +40,8 @@ export const getRecommendServers = async () => {
     return response.data as RecommendServer[]
 }
 
-export const getServerCollectionByUser = async (address: string) => {
-    const response = await axios.get(`/api/user/serverCollection/${address}`);
+export const getServerCollectionByUser = async () => {
+    const response = await axios.get(`/api/user/serverCollection`);
     if (response.status !== 200) {
         throw new Error(response.statusText)
     }
@@ -74,4 +74,12 @@ export const login = async (address: string, signature: string) => {
         throw new Error(response.statusText)
     }
     return response.data as LoginResponse
+}
+
+export const addChannel = async (body: { server: string; channel: string }) => {
+    const response = await axios.post("/api/chat/add", body);
+    if (response.status !== 200) {
+        throw new Error(response.statusText)
+    }
+    return response.data.chatRoomId as string
 }

@@ -44,6 +44,8 @@ contract DappcordServer is ERC721 {
         _;
     }
 
+    event ChannelCreated(uint256 channelId);
+
     constructor(
         string memory _name,
         string memory _symbol
@@ -55,12 +57,20 @@ contract DappcordServer is ERC721 {
         return categoryIdList;
     }
 
-    function getChannelIdList(uint256 _categoryId)public view returns(uint256[] memory) {
+    function getChannelIdList(
+        uint256 _categoryId
+    ) public view returns (uint256[] memory) {
         return categoryMapping[_categoryId].channelIdList;
     }
 
-    function getMemberList(uint256 _channelId)public view returns(address[] memory) {
+    function getMemberList(
+        uint256 _channelId
+    ) public view returns (address[] memory) {
         return channelMapping[_channelId].memberList;
+    }
+
+    function getlatestChannelId() public view returns (uint256) {
+        return channelCounter;
     }
 
     function hasCategory(uint256 _categoryId) private view returns (bool) {
@@ -96,6 +106,8 @@ contract DappcordServer is ERC721 {
 
         // connect to the category
         categoryMapping[_categoryId].channelIdList.push(channelCounter);
+
+        emit ChannelCreated(channelCounter);
     }
 
     function createCategory(string memory _categoryName) public onlyOwner {
