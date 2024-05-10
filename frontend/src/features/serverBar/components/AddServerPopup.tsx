@@ -1,7 +1,7 @@
 import { showPopup, closePopup, CloseIcon } from "../../../components/Popup";
 import arrowRight from "../../../assets/arrow-right-4D545E.svg";
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../hooks";
+import { useAppDispatch } from "../../../hooks";
 import { addServer, setCurrentServer } from "../../../store/serverSlice";
 import MyInput from "../../../components/MyInput";
 import { deployDappcordServer } from "../../../libs";
@@ -21,9 +21,6 @@ const AddServer = () => {
   const dispatch = useAppDispatch();
 
   const [step, setStep] = useState(Step.CREATE_YOUR_SERVER);
-  const currentWalletAddress = useAppSelector(
-    (state) => state.account.currentWalletAddress
-  );
   const [serverName, setServerName] = useState("");
   const [serverSymbol, setServerSymbol] = useState("");
   const [serverAddress, setServerAddress] = useState("");
@@ -35,12 +32,7 @@ const AddServer = () => {
   const createServer = async () => {
     const address = await deployDappcordServer(serverName, serverSymbol);
     dispatch(addServer(address));
-    addServerAPI({
-      owner: currentWalletAddress,
-      address: address,
-      name: serverName,
-      symbol: serverSymbol,
-    });
+    addServerAPI(address);
 
     closePopup();
   };
@@ -48,10 +40,7 @@ const AddServer = () => {
   const handleJoin = async () => {
     try {
       await dispatch(addServer(serverAddress));
-      addServerCollectionByUser({
-        user: currentWalletAddress,
-        server: serverAddress,
-      });
+      addServerCollectionByUser(serverAddress);
       dispatch(setCurrentServer(serverAddress));
       setInviteLinkError("");
       closePopup();

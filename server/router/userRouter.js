@@ -20,16 +20,11 @@ router.post(
 
 router.post(
   "/addServerCollection",
-  toLowerCaseMiddleware(["user", "server"]),
+  toLowerCaseMiddleware(["server"]),
   protect,
   addServerCollection
 );
 
-router.get(
-  "/serverCollection/:address",
-  toLowerCaseMiddleware(["address"]),
-  protect,
-  getServerCollection
-);
+router.get("/serverCollection", protect, getServerCollection);
 
 module.exports = router;

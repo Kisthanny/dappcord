@@ -35,20 +35,11 @@ const authUser = asyncHandler(async (req, res) => {
 });
 
 const addServerCollection = asyncHandler(async (req, res) => {
-  const { user, server } = req.body;
+  const { server } = req.body;
 
-  if (!user || !server) {
+  if (!server) {
     res.status(400);
     throw new Error("missing argument");
-  }
-
-  let userObj = await User.findOne({ address: user });
-  if (!userObj) {
-    userObj = await User.create({ address: user });
-    if (!userObj) {
-      res.status(400);
-      throw new Error("Add User Failed");
-    }
   }
 
   const serverObj = await Server.findOne({ address: server });
@@ -57,7 +48,7 @@ const addServerCollection = asyncHandler(async (req, res) => {
     throw new Error("Server not found");
   }
 
-  const alreadyExists = userObj.servers.some((serverId) =>
+  const alreadyExists = req.user.servers.some((serverId) =>
     serverId.equals(serverObj._id)
   );
   if (alreadyExists) {
@@ -65,8 +56,8 @@ const addServerCollection = asyncHandler(async (req, res) => {
     throw new Error("Server already exists in user's collection");
   }
 
-  userObj.servers.push(serverObj._id);
-  await userObj.save();
+  req.user.servers.push(serverObj._id);
+  await req.user.save();
 
   res.status(201).json({
     message: "success",
@@ -74,14 +65,13 @@ const addServerCollection = asyncHandler(async (req, res) => {
 });
 
 const getServerCollection = asyncHandler(async (req, res) => {
-  const { address } = req.params;
-  const user = await User.findOne({ address });
+  const user = req.user;
   if (!user) {
     res.status(200).json([]);
   }
 
   const promiseList = user.servers.map(async (serverId) => {
-    const server = await Server.findOne({ _id: serverId });
+    const server = await Server.findById(serverId);
     if (!server) {
       res.status(400);
       throw new Error("Server not Found");

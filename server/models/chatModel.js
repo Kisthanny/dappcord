@@ -2,8 +2,13 @@ const mongoose = require("mongoose");
 
 const chatModel = mongoose.Schema(
   {
-    serverAddress: { type: String, trim: true },
-    channelId: { type: String, trim: true },
+    server: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "Server",
+    },
+    owner: { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
+    channel: { type: String, trim: true },
+    fee: { type: String, trim: true, default: "0" },
   },
   {
     timestamps: true,

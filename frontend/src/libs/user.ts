@@ -1,6 +1,7 @@
 import { login } from "../api";
 
 export const signIn = async (account: string) => {
+    sessionStorage.removeItem('token')
     const ethereum = window.ethereum;
     try {
         if (!ethereum) {

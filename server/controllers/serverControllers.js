@@ -1,11 +1,12 @@
 const asyncHandler = require("express-async-handler");
 const Server = require("../models/serverModel");
 const User = require("../models/userModel");
+const { getOwner, getSymbol, getName } = require("../blockChainApi/index");
 
 const addServer = asyncHandler(async (req, res) => {
-  const { owner, address, name, symbol } = req.body;
+  const { address } = req.body;
 
-  if (!owner || !address || !name || !symbol) {
+  if (!address) {
     res.status(400);
     throw new Error("missing argument");
   }
@@ -16,16 +17,11 @@ const addServer = asyncHandler(async (req, res) => {
     throw new Error("Server already exists");
   }
 
-  let user = await User.findOne({ address: owner });
-  if (!user) {
-    user = await User.create({
-      address: owner,
-    });
-    if (!user) {
-      res.status(400);
-      throw new Error("Failed to Add the Owner");
-    }
-  }
+  const [owner, symbol, name] = await Promise.all([
+    getOwner.bind(null, address),
+    getSymbol.bind(null, address),
+    getName.bind(null, address),
+  ]);
 
   const server = await Server.create({
     owner,
@@ -36,6 +32,11 @@ const addServer = asyncHandler(async (req, res) => {
   if (!server) {
     res.status(400);
     throw new Error("Failed to Add the Server");
+  }
+
+  let user = await User.findOne({ address: owner.toLocaleLowerCase() });
+  if (!user) {
+    user = await User.create({ address: owner.toLocaleLowerCase() });
   }
 
   user.servers.push(server._id);

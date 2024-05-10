@@ -5,6 +5,7 @@ const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 const serverRouter = require("./router/serverRouter");
 const userRouter = require("./router/userRouter");
+const chatRouter = require("./router/chatRouter");
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/server", serverRouter);
 app.use("/api/user", userRouter);
+app.use("/api/chat", chatRouter);
 
 app.use(notFound);
 app.use(errorHandler);

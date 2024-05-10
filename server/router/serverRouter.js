@@ -14,7 +14,7 @@ router.get("/:address", toLowerCaseMiddleware(["address"]), getServerByAddress);
 
 router.post(
   "/add",
-  toLowerCaseMiddleware(["address", "owner"]),
+  toLowerCaseMiddleware(["address"]),
   protect,
   addServer
 );
