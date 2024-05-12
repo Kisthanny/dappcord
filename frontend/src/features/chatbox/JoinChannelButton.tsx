@@ -7,6 +7,7 @@ import {
 } from "../../libs/index";
 import { useAppDispatch } from "../../hooks";
 import { updateServer } from "../../store/serverSlice";
+import { fetchChat } from "../../api";
 
 const JoinChannelButton = ({
   server,
@@ -15,7 +16,7 @@ const JoinChannelButton = ({
 }: {
   server: Server | null;
   channel: Channel | null;
-  onJoin: (channelId:string) => void;
+  onJoin: (channelId: string, chatRoomId: string) => void;
 }) => {
   const dispatch = useAppDispatch();
   const joinChannel = async () => {
@@ -29,7 +30,11 @@ const JoinChannelButton = ({
         });
       await transaction.wait();
       await dispatch(updateServer(server.address));
-      onJoin(channel.channelId);
+      const chatRoomId = await fetchChat({
+        server: server.address,
+        channel: channel.channelId,
+      });
+      onJoin(channel.channelId, chatRoomId);
     }
   };
   return (

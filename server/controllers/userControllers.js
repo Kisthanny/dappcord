@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const Server = require("../models/serverModel");
 const generateToken = require("../config/generateToken");
+const { getUserFallback, getServerFallback } = require("./fallback");
 
 const authUser = asyncHandler(async (req, res) => {
   const { address, signature } = req.body;
@@ -16,16 +17,7 @@ const authUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid Signature");
   }
 
-  let user = await User.findOne({ address });
-  if (!user) {
-    user = await User.create({
-      address,
-    });
-    if (!user) {
-      res.status(400);
-      throw new Error("Failed to Add the User");
-    }
-  }
+  const user = await getUserFallback(address);
 
   res.status(201).json({
     _id: user._id,
@@ -42,11 +34,7 @@ const addServerCollection = asyncHandler(async (req, res) => {
     throw new Error("missing argument");
   }
 
-  const serverObj = await Server.findOne({ address: server });
-  if (!serverObj) {
-    res.status(400);
-    throw new Error("Server not found");
-  }
+  const serverObj = await getServerFallback(server);
 
   const alreadyExists = req.user.servers.some((serverId) =>
     serverId.equals(serverObj._id)

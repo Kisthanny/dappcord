@@ -83,3 +83,11 @@ export const addChannel = async (body: { server: string; channel: string }) => {
     }
     return response.data.chatRoomId as string
 }
+
+export const fetchChat = async ({ server, channel }: { server: string; channel: string }) => {
+    const response = await axios.get(`/api/chat/fetchChat?server=${server}&channel=${channel}`);
+    if (response.status !== 200) {
+        throw new Error(response.statusText)
+    }
+    return response.data.chatRoomId as string
+}

@@ -1,7 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Server = require("../models/serverModel");
-const User = require("../models/userModel");
-const { getOwner, getSymbol, getName } = require("../blockChainApi/index");
+const { getServerFallback } = require("./fallback");
 
 const addServer = asyncHandler(async (req, res) => {
   const { address } = req.body;
@@ -11,37 +10,10 @@ const addServer = asyncHandler(async (req, res) => {
     throw new Error("missing argument");
   }
 
-  const serverExist = await Server.findOne({ address });
-  if (serverExist) {
-    res.status(400);
-    throw new Error("Server already exists");
-  }
+  const server = await getServerFallback(address);
 
-  const [owner, symbol, name] = await Promise.all([
-    getOwner(address),
-    getSymbol(address),
-    getName(address),
-  ]);
-  console.log(owner);
-
-  const server = await Server.create({
-    owner,
-    address,
-    name,
-    symbol,
-  });
-  if (!server) {
-    res.status(400);
-    throw new Error("Failed to Add the Server");
-  }
-
-  let user = await User.findOne({ address: owner.toLocaleLowerCase() });
-  if (!user) {
-    user = await User.create({ address: owner.toLocaleLowerCase() });
-  }
-
-  user.servers.push(server._id);
-  await user.save();
+  req.user.servers.push(server._id);
+  await req.user.save();
 
   res.status(201).json({
     _id: server._id,
@@ -69,7 +41,7 @@ const getServers = asyncHandler(async (req, res) => {
 
 const getServerByAddress = asyncHandler(async (req, res) => {
   const { address } = req.params;
-  const server = await Server.find({ address });
+  const server = await getServerFallback(address);
   res.send(server);
 });
 

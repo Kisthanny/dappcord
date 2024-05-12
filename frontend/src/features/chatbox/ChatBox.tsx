@@ -10,11 +10,14 @@ import {
   getChannelById,
 } from "../../libs";
 import { setCurrentChannel } from "../../store/channelSlice";
+import { setChatRoomId } from "../../store/chatSlice";
+import { fetchChat } from "../../api";
 
 const socket = io(import.meta.env.VITE_ENDPOINT);
 
 const ChatBox = () => {
   const [messages, setMessages] = useState([] as Message[]);
+  const roomId = useAppSelector((state) => state.chat.roomId);
   const userHasJoined = useAppSelector((state) => state.channel.userHasJoined);
   const isOwner = useAppSelector((state) => state.server.isOwner);
   const currentServer = useAppSelector((state) => state.server.currentServer);
@@ -30,85 +33,35 @@ const ChatBox = () => {
     socket.emit("sendMessage", messageObj);
   };
 
-  const handleOnJoin = (channelId: string) => {
+  const handleOnJoin = (channelId: string, chatRoomId: string) => {
     if (currentServer) {
       const channel = getChannelById(channelId, currentServer);
       dispatch(setCurrentChannel(channel));
-      joinChannel();
-      startListening();
+      dispatch(setChatRoomId(chatRoomId));
     }
   };
 
-  const joinChannel = async () => {
-    if (!currentServer || !currentChannel) {
-      return;
+  const fetchNewChatRoom = async () => {
+    if (currentServer && currentChannel) {
+      const newRoomId = await fetchChat({
+        server: currentServer.address,
+        channel: currentChannel.channelId,
+      });
+      dispatch(setChatRoomId(newRoomId));
     }
-    socket.emit("join", {
-      server: currentServer.address,
-      channel: currentChannel.channelId,
-      account: currentWalletAddress,
-    });
-
-    socket.emit("getMessages", {
-      server: currentServer.address,
-      channel: currentChannel.channelId,
-    });
-  };
-  const leaveChannel = async () => {
-    if (!currentServer || !currentChannel) {
-      return;
-    }
-    socket.emit("leave", {
-      server: currentServer.address,
-      channel: currentChannel.channelId,
-      account: currentWalletAddress,
-    });
-  };
-
-  const startListening = () => {
-    socket.on(
-      "newMessage",
-      ({
-        account,
-        text,
-        history,
-      }: {
-        account: string;
-        text: string;
-        history: Message[];
-      }) => {
-        setMessages(history);
-      }
-    );
-
-    socket.on("messageHistory", (messages: Message[]) => {
-      setMessages(messages);
-    });
   };
 
   const onRoomChanged = async () => {
-    if (currentServer && currentChannel) {
-      joinChannel();
-      startListening();
-    }
+    console.log("join new chat room: ", roomId);
   };
 
   useEffect(() => {
-    if (currentServer && currentChannel) {
-      const isOwnerSync = getIsOwnerSync(currentServer, currentWalletAddress);
-      const hasJoinedSync = getUserHasJoinedSync(
-        currentChannel,
-        currentWalletAddress
-      );
-      if (isOwnerSync || hasJoinedSync) {
-        onRoomChanged();
-        return () => {
-          leaveChannel();
-          socket.off();
-        };
-      }
-    }
-  }, [currentChannel, currentWalletAddress]);
+    onRoomChanged();
+  }, [roomId]);
+
+  useEffect(() => {
+    fetchNewChatRoom();
+  }, [currentServer, currentChannel]);
 
   return (
     <section className="flex-grow">

@@ -11,6 +11,6 @@ router.post(
   addChannel
 );
 
-router.get("/fetchChat", protect, toLowerCaseMiddleware(["sever", "channel"]), fetchChat);
+router.get("/fetchChat", protect, toLowerCaseMiddleware(["server", "channel"]), fetchChat);
 
 module.exports = router;

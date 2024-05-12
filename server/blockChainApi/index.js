@@ -60,6 +60,10 @@ const channelOnServer = async ({ server, channel }) => {
   return channelObj.channelId !== 0n;
 };
 
+const isAddress = (address) => {
+  return ethers.isAddress(address);
+};
+
 module.exports = {
   blockChainVerifyIsOwner,
   blockChainGetFee,
@@ -69,4 +73,5 @@ module.exports = {
   getAccess,
   hasJoined,
   channelOnServer,
+  isAddress,
 };
