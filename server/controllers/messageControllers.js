@@ -33,7 +33,14 @@ const allMessages = asyncHandler(async (req, res) => {
   try {
     const messages = await Message.find({ chat: req.params.chatId })
       .populate("sender", "address")
-      .populate("chat", "server channel");
+      .populate({
+        path: "chat",
+        select: "channel",
+        populate: {
+          path: "server",
+          select: "address",
+        },
+      });
     res.json(messages);
   } catch (error) {
     res.status(400);

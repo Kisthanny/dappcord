@@ -7,6 +7,26 @@ export type RecommendServer = {
     symbol: string;
 }
 
+export type MessageObj = {
+    _id: string;
+    sender: {
+        _id: string;
+        address: string;
+    };
+    content: string;
+    chat: {
+        _id: string;
+        server: {
+            _id: string;
+            address: string;
+        };
+        channel: string;
+    },
+    createdAt: string;
+    updatedAt: string
+    __v: number
+}
+
 type LoginResponse = {
     _id: string;
     address: string;
@@ -90,4 +110,19 @@ export const fetchChat = async ({ server, channel }: { server: string; channel: 
         throw new Error(response.statusText)
     }
     return response.data.chatRoomId as string
+}
+
+export const sendMessage = async (body: { content: string; chatId: string }) => {
+    const response = await axios.post("/api/message", body);
+    if (response.status !== 200) {
+        throw new Error(response.statusText)
+    }
+}
+
+export const allMessages = async (chatRoomId: string) => {
+    const response = await axios.get(`api/message/${chatRoomId}`);
+    if (response.status !== 200) {
+        throw new Error(response.statusText)
+    }
+    return response.data as MessageObj[];
 }

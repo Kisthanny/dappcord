@@ -11,7 +11,7 @@ import {
 } from "../../libs";
 import { setCurrentChannel } from "../../store/channelSlice";
 import { setChatRoomId } from "../../store/chatSlice";
-import { fetchChat } from "../../api";
+import { allMessages, fetchChat, sendMessage } from "../../api";
 
 const socket = io(import.meta.env.VITE_ENDPOINT);
 
@@ -30,7 +30,8 @@ const ChatBox = () => {
   const dispatch = useAppDispatch();
 
   const onSendMessage = (messageObj: Message) => {
-    socket.emit("sendMessage", messageObj);
+    // socket.emit("sendMessage", messageObj);
+    sendMessage({ content: messageObj.text, chatId: roomId });
   };
 
   const handleOnJoin = (channelId: string, chatRoomId: string) => {
@@ -52,7 +53,18 @@ const ChatBox = () => {
   };
 
   const onRoomChanged = async () => {
+    if (!roomId) {
+      return;
+    }
     console.log("join new chat room: ", roomId);
+    const response = await allMessages(roomId);
+    const messageList = response.map((o) => ({
+      server: o.chat.server.address,
+      channel: o.chat.channel,
+      account: o.sender.address,
+      text: o.content,
+    }));
+    setMessages(messageList);
   };
 
   useEffect(() => {
