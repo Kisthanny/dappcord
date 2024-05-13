@@ -1,10 +1,12 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 interface ChatState {
-    roomId: string
+    roomId: string;
+    loading: boolean;
 }
 
 const initialState: ChatState = {
     roomId: "",
+    loading: false,
 }
 
 export const chatSlice = createSlice({
@@ -14,9 +16,12 @@ export const chatSlice = createSlice({
         setChatRoomId: (state, action: PayloadAction<string>) => {
             state.roomId = action.payload;
         },
+        setLoading: (state, action: PayloadAction<boolean>) => {
+            state.loading = action.payload;
+        },
     }
 })
 
-export const { setChatRoomId } = chatSlice.actions
+export const { setChatRoomId, setLoading } = chatSlice.actions
 
 export default chatSlice.reducer

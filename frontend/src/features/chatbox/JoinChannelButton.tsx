@@ -5,22 +5,21 @@ import {
   getServerContract,
   getSigner,
 } from "../../libs/index";
-import { useAppDispatch } from "../../hooks";
-import { updateServer } from "../../store/serverSlice";
 import { fetchChat } from "../../api";
+import { useAppDispatch } from "../../hooks";
+import { setChatRoomId, setLoading } from "../../store/chatSlice";
 
 const JoinChannelButton = ({
   server,
   channel,
-  onJoin,
 }: {
   server: Server | null;
   channel: Channel | null;
-  onJoin: (channelId: string, chatRoomId: string) => void;
 }) => {
   const dispatch = useAppDispatch();
   const joinChannel = async () => {
     if (server && channel) {
+      dispatch(setLoading(true));
       const serverContract = await getServerContract(server.address);
       const signer = await getSigner();
       const transaction = await serverContract
@@ -29,12 +28,11 @@ const JoinChannelButton = ({
           value: channel.channelFee,
         });
       await transaction.wait();
-      await dispatch(updateServer(server.address));
       const chatRoomId = await fetchChat({
         server: server.address,
         channel: channel.channelId,
       });
-      onJoin(channel.channelId, chatRoomId);
+      dispatch(setChatRoomId(chatRoomId));
     }
   };
   return (

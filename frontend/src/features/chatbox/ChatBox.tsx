@@ -4,13 +4,7 @@ import { useEffect, useState } from "react";
 import { Message } from "../../libs/chat";
 import ChatMessages from "./ChatMessages";
 import JoinChannelButton from "./JoinChannelButton";
-import {
-  getIsOwnerSync,
-  getUserHasJoinedSync,
-  getChannelById,
-} from "../../libs";
-import { setCurrentChannel } from "../../store/channelSlice";
-import { setChatRoomId } from "../../store/chatSlice";
+import { setChatRoomId, setLoading } from "../../store/chatSlice";
 import { MessageObj, allMessages, fetchChat, sendMessage } from "../../api";
 
 const socket = io(import.meta.env.VITE_ENDPOINT);
@@ -18,8 +12,7 @@ const socket = io(import.meta.env.VITE_ENDPOINT);
 const ChatBox = () => {
   const [messages, setMessages] = useState([] as Message[]);
   const roomId = useAppSelector((state) => state.chat.roomId);
-  const userHasJoined = useAppSelector((state) => state.channel.userHasJoined);
-  const isOwner = useAppSelector((state) => state.server.isOwner);
+  const isLoading = useAppSelector((state) => state.chat.loading);
   const currentServer = useAppSelector((state) => state.server.currentServer);
   const currentChannel = useAppSelector(
     (state) => state.channel.currentChannel
@@ -29,25 +22,18 @@ const ChatBox = () => {
   );
   const dispatch = useAppDispatch();
 
-  const onSendMessage = async (messageObj: Message) => {
+  const onSendMessage = async (text: string) => {
     const data = await sendMessage({
-      content: messageObj.text,
+      content: text,
       chatId: roomId,
     });
     socket.emit("newMessage", data);
     appendMessage(data);
   };
 
-  const handleOnJoin = (channelId: string, chatRoomId: string) => {
-    if (currentServer) {
-      const channel = getChannelById(channelId, currentServer);
-      dispatch(setCurrentChannel(channel));
-      dispatch(setChatRoomId(chatRoomId));
-    }
-  };
-
   const fetchNewChatRoom = async () => {
     if (currentServer && currentChannel) {
+      dispatch(setLoading(true));
       const newRoomId = await fetchChat({
         server: currentServer.address,
         channel: currentChannel.channelId,
@@ -58,6 +44,7 @@ const ChatBox = () => {
 
   const onRoomChanged = async () => {
     if (!roomId) {
+      dispatch(setLoading(false));
       return;
     }
     socket.emit("join", { user: currentWalletAddress, roomId });
@@ -71,6 +58,7 @@ const ChatBox = () => {
       timestamp: new Date(o.createdAt).getTime(),
     }));
     setMessages(messageList);
+    dispatch(setLoading(false));
   };
 
   useEffect(() => {
@@ -115,7 +103,7 @@ const ChatBox = () => {
 
   return (
     <section className="flex-grow">
-      {(isOwner || userHasJoined) && currentChannel && (
+      {!isLoading && roomId && currentChannel && (
         <ChatMessages
           messages={messages.filter(
             (message) =>
@@ -127,16 +115,17 @@ const ChatBox = () => {
           onSendMessage={onSendMessage}
         />
       )}
-      {!isOwner && !userHasJoined && currentChannel && (
-        <JoinChannelButton
-          server={currentServer}
-          channel={currentChannel}
-          onJoin={handleOnJoin}
-        />
+      {!isLoading && !roomId && currentChannel && (
+        <JoinChannelButton server={currentServer} channel={currentChannel} />
       )}
-      {currentChannel === null && (
+      {!isLoading && currentChannel === null && (
         <div className="w-full h-full flex items-center justify-center">
           <p>Select a Channel to Chat</p>
+        </div>
+      )}
+      {isLoading && (
+        <div className="w-full h-full flex items-center justify-center">
+          Loading...
         </div>
       )}
     </section>
