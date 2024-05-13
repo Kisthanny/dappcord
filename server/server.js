@@ -36,59 +36,34 @@ const server = app.listen(PORT, () =>
 );
 
 const io = new Server(server, {
+  pingTimeout: 60000,
   cors: {
     origin: "http://localhost:5173",
   },
 });
 
-const messageRecord = require("./messages");
-
-const getRoomId = (server, channel) => {
-  return `${server.toLocaleLowerCase()}-${channel.toLocaleLowerCase()}`;
-};
-
 io.on("connection", (socket) => {
   console.log("We have a new connection!!!");
 
-  socket.on("join", ({ server, channel, account }) => {
-    if (!server || !channel || !account) {
-      return;
-    }
-    const roomId = getRoomId(server, channel);
+  socket.on("join", ({ user, roomId }) => {
     socket.join(roomId);
-    console.log(`${account} join the room ${roomId}`);
+    console.log(`User ${user.slice(-4)} Joined Room: ${roomId.slice(-4)}`);
   });
 
-  socket.on("leave", ({ server, channel, account }) => {
-    if (!server || !channel || !account) {
+  socket.on("leave", ({ user, roomId }) => {
+    socket.leave(roomId);
+    console.log(`User ${user.slice(-4)} Leave Room: ${roomId.slice(-4)}`);
+  });
+
+  socket.on("newMessage", (newMessageRecieved) => {
+    console.log("newMessage");
+    const chat = newMessageRecieved.chat;
+    if (!chat._id) {
+      console.log("chat._id not defined");
       return;
     }
-    const roomId = getRoomId(server, channel);
-    socket.leave(roomId);
-    console.log(`${account} leave the room ${roomId}`);
-  });
-
-  socket.on("sendMessage", ({ server, channel, text, account }) => {
-    const roomId = getRoomId(server, channel);
-    messageRecord.addMessage({
-      server,
-      channel,
-      account,
-      text,
-    });
-    io.to(roomId).emit("newMessage", {
-      account,
-      text,
-      history: messageRecord.history[roomId],
-    });
-    console.log(`${account}: ${text}`);
-  });
-
-  socket.on("getMessages", ({ server, channel }) => {
-    socket.emit(
-      "messageHistory",
-      messageRecord.getMessagesFromRoom({ server, channel })
-    );
+    console.log("should emit");
+    socket.in(chat._id).emit("message recieved", newMessageRecieved);
   });
 
   socket.on("disconnect", () => {

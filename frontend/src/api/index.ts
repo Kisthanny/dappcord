@@ -117,6 +117,7 @@ export const sendMessage = async (body: { content: string; chatId: string }) => 
     if (response.status !== 200) {
         throw new Error(response.statusText)
     }
+    return response.data as MessageObj;
 }
 
 export const allMessages = async (chatRoomId: string) => {

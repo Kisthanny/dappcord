@@ -11,7 +11,7 @@ import {
 } from "../../libs";
 import { setCurrentChannel } from "../../store/channelSlice";
 import { setChatRoomId } from "../../store/chatSlice";
-import { allMessages, fetchChat, sendMessage } from "../../api";
+import { MessageObj, allMessages, fetchChat, sendMessage } from "../../api";
 
 const socket = io(import.meta.env.VITE_ENDPOINT);
 
@@ -29,9 +29,13 @@ const ChatBox = () => {
   );
   const dispatch = useAppDispatch();
 
-  const onSendMessage = (messageObj: Message) => {
-    // socket.emit("sendMessage", messageObj);
-    sendMessage({ content: messageObj.text, chatId: roomId });
+  const onSendMessage = async (messageObj: Message) => {
+    const data = await sendMessage({
+      content: messageObj.text,
+      chatId: roomId,
+    });
+    socket.emit("newMessage", data);
+    appendMessage(data);
   };
 
   const handleOnJoin = (channelId: string, chatRoomId: string) => {
@@ -56,24 +60,58 @@ const ChatBox = () => {
     if (!roomId) {
       return;
     }
-    console.log("join new chat room: ", roomId);
+    socket.emit("join", { user: currentWalletAddress, roomId });
+
     const response = await allMessages(roomId);
     const messageList = response.map((o) => ({
       server: o.chat.server.address,
       channel: o.chat.channel,
       account: o.sender.address,
       text: o.content,
+      timestamp: new Date(o.createdAt).getTime(),
     }));
     setMessages(messageList);
   };
 
   useEffect(() => {
     onRoomChanged();
+    return () => {
+      if (!roomId) {
+        return;
+      }
+      socket.emit("leave", { user: currentWalletAddress, roomId });
+    };
   }, [roomId]);
 
   useEffect(() => {
     fetchNewChatRoom();
   }, [currentServer, currentChannel]);
+
+  useEffect(() => {
+    const listener = (newMessage: MessageObj) => {
+      appendMessage(newMessage);
+    };
+    socket.on("message recieved", listener);
+    return () => {
+      socket.off("message recieved", listener);
+    };
+  }, []);
+
+  const appendMessage = (message: MessageObj) => {
+    const timestamp = new Date(message.createdAt).getTime();
+    const newMessageObj: Message = {
+      server: message.chat.server.address,
+      channel: message.chat.channel,
+      account: message.sender.address,
+      text: message.content,
+      timestamp,
+    };
+    setMessages((prevMessages) => [...prevMessages, newMessageObj]);
+  };
+
+  useEffect(() => {
+    setMessages(messages.sort((a, b) => a.timestamp - b.timestamp));
+  }, [messages]);
 
   return (
     <section className="flex-grow">

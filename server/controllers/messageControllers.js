@@ -20,7 +20,14 @@ const sendMessage = asyncHandler(async (req, res) => {
   try {
     let message = await Message.create(newMessage);
     message = await message.populate("sender", "address");
-    message = await message.populate("chat", "server channel");
+    message = await message.populate({
+      path: "chat",
+      select: "channel",
+      populate: {
+        path: "server",
+        select: "address",
+      },
+    });
     res.json(message);
   } catch (error) {
     res.status(400);
