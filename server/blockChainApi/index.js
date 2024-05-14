@@ -1,7 +1,28 @@
 const { ethers } = require("ethers");
 const DAPPCORD_ABI = require("../abis/DappcordServer.json");
+require("dotenv").config();
 
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+const getProvider = () => {
+  const rpcUrl = process.env.RPC_URL;
+  if (!rpcUrl) {
+    throw new Error("RPC_URL is not defined in .env file");
+  }
+
+  const provider = new ethers.JsonRpcProvider(rpcUrl);
+
+  provider
+    .getNetwork()
+    .then((network) => {
+      console.log("Connected to network:", network);
+    })
+    .catch((error) => {
+      console.error("Failed to connect to network:", error);
+    });
+
+  return provider;
+};
+
+const provider = getProvider();
 
 const blockChainVerifyIsOwner = async ({ server, user }) => {
   try {
