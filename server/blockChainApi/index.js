@@ -12,8 +12,8 @@ const getProvider = () => {
 
   provider
     .getNetwork()
-    .then((network) => {
-      console.log("Connected to network:", network);
+    .then(() => {
+      console.log("Connected to network");
     })
     .catch((error) => {
       console.error("Failed to connect to network:", error);
