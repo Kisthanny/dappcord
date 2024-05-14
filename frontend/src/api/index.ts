@@ -45,6 +45,10 @@ axios.interceptors.request.use(
             config.headers['Authorization'] = `Bearer ${token}`;
         }
 
+        if (config.url && config.url.startsWith('/api')) {
+            config.url = `https://dappcord-api.vercel.app${config.url}`;
+        }
+
         return config;
     },
     function (error) {

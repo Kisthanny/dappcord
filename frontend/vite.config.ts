@@ -9,13 +9,5 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src')
     }
-  },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'https://dappcord-api.vercel.app',
-        changeOrigin: true
-      }
-    }
   }
 })
