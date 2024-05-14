@@ -21,7 +21,7 @@ const app = express();
 // 使用 CORS 中间件
 app.use(
   cors({
-    origin: process.env.FRONTEND_HOST, // 你的前端域名
+    origin: "*", // 你的前端域名
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
