@@ -46,7 +46,8 @@ const getServerFallback = async (address) => {
  * create a new one if object does not exist in DB
  * @param {*} address
  */
-const getUserFallback = async (address) => {
+const getUserFallback = async (_address) => {
+  const address = _address.toLowerCase();
   let user = await User.findOne({ address });
   if (user) {
     return user;
