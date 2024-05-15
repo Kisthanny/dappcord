@@ -46,7 +46,7 @@ axios.interceptors.request.use(
         }
 
         if (config.url && config.url.startsWith('/api')) {
-            config.url = `https://dappcord-api.vercel.app${config.url}`;
+            config.url = `${import.meta.env.VITE_ENDPOINT}${config.url}`;
         }
 
         return config;
@@ -125,7 +125,7 @@ export const sendMessage = async (body: { content: string; chatId: string }) => 
 }
 
 export const allMessages = async (chatRoomId: string) => {
-    const response = await axios.get(`api/message/${chatRoomId}`);
+    const response = await axios.get(`/api/message/${chatRoomId}`);
     if (response.status !== 200) {
         throw new Error(response.statusText)
     }

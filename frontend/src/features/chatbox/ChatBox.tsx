@@ -39,6 +39,7 @@ const ChatBox = () => {
         channel: currentChannel.channelId,
       });
       dispatch(setChatRoomId(newRoomId));
+      dispatch(setLoading(false));
     }
   };
 
