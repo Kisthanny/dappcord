@@ -25,7 +25,7 @@ const ServerBar = () => {
       return;
     }
     await signIn(currentWalletAddress);
-    const collection = await getServerCollectionByUser(currentWalletAddress);
+    const collection = await getServerCollectionByUser();
     const servers = await getServers(collection);
     dispatch(setServerList(servers));
   };
