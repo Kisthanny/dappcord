@@ -41,17 +41,9 @@ app.use("/api/message", messageRoute);
 app.use(notFound);
 app.use(errorHandler);
 
-const getServer = () => {
-  const env = process.env.NODE_ENV;
-  if (env === "production") {
-    return require("http").createServer(app);
-  }
-  return app.listen(PORT, () =>
-    console.log(`Server has started on port ${PORT}`)
-  );
-};
-
-const server = getServer();
+const server = app.listen(PORT, () =>
+  console.log(`Server has started on port ${PORT}`)
+);
 
 const io = new Server(server, {
   pingTimeout: 60000,
