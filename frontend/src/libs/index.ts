@@ -49,7 +49,7 @@ export async function getServerContract(address: string) {
     if (ethereum === undefined) {
         throw new Error('Please install Metamask')
     }
-    const provider = new ethers.JsonRpcProvider(RPC_URL)
+    const provider = new ethers.BrowserProvider(ethereum)
 
     // Check if the contract exists
     const code = await provider.getCode(address);
